@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ICC Sports AZ — 3D Virtual Tour v5</title>
+<title>ICC Sports AZ — 3D Virtual Tour v6</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { overflow:hidden; background:#0d1a10; font-family:'Segoe UI',system-ui,sans-serif; }
@@ -110,10 +110,10 @@ canvas:active { cursor:grabbing; }
 </head>
 <body>
 
-<div id="load"><h2>ICC SPORTS AZ</h2><p>Loading 3D Facility Tour v5...</p><div id="load-bar"><div id="load-fill"></div></div></div>
+<div id="load"><h2>ICC SPORTS AZ</h2><p>Loading 3D Facility Tour v6...</p><div id="load-bar"><div id="load-fill"></div></div></div>
 
 <div id="hud">
-  <h1>ICC SPORTS AZ — 3D Virtual Tour v5</h1>
+  <h1>ICC SPORTS AZ — 3D Virtual Tour v6</h1>
   <div class="sub">9,000 SF &nbsp;|&nbsp; 75 × 120 ft &nbsp;|&nbsp; 20 ft ceiling &nbsp;|&nbsp; Drag=Rotate &nbsp;·&nbsp; Scroll=Zoom &nbsp;·&nbsp; D=Dims &nbsp;·&nbsp; V=Version &nbsp;·&nbsp; N=Nets &nbsp;·&nbsp; 1–7=Views</div>
 </div>
 
@@ -146,9 +146,10 @@ canvas:active { cursor:grabbing; }
   <div class="sr"><span class="k">Total Area</span><span class="v">9,000 SF</span></div>
   <div class="sr"><span class="k">Footprint</span><span class="v">75 × 120 ft</span></div>
   <div class="sr"><span class="k">Ceiling</span><span class="v">20 ft clear</span></div>
-  <div class="sr"><span class="k">Lanes</span><span class="v">6 × 12 ft wide</span></div>
+  <div class="sr"><span class="k">Lanes</span><span class="v">6 × 10 ft wide</span></div>
   <div class="sr"><span class="k">Lane length</span><span class="v">90 ft playing</span></div>
-  <div class="sr"><span class="k">Box court</span><span class="v">36 × 90 ft</span></div>
+  <div class="sr"><span class="k">Box court</span><span class="v">30 × 90 ft</span></div>
+  <div class="sr"><span class="k">Side aisles</span><span class="v">7.5 ft each</span></div>
   <div class="sr"><span class="k">Support zone</span><span class="v">30 ft deep</span></div>
   <div class="sr"><span class="k">Viewing lounge</span><span class="v">75 × 18 ft</span></div>
   <div id="mode-badge" style="background:#1B5E20;color:#F9A825;font-size:10.5px;font-weight:700;text-align:center;margin-top:8px;padding:5px 8px;border-radius:5px;">V1 — 6 Individual Lanes</div>
@@ -182,10 +183,10 @@ const inc = n => { lp=Math.min(100,lp+n); lf.style.width=lp+'%'; };
 const W  = 75,  // building width (X: -37.5 to +37.5)
       D  = 120, // building depth (Z: -60 to +60, entrance at +60)
       H  = 20;  // ceiling height
-const LW = 12, LL = 90, LN = 6; // lane width, length, count
-const FD = 30, VLD = 18;        // front support zone depth, viewing lounge depth (expanded to 18ft)
-// 6 lane centers along X (buffers 1.5ft each side, lanes packed 12ft each)
-const LX  = [-30,-18,-6,6,18,30];
+const LW = 10, LL = 90, LN = 6; // lane width, length, count (Option B: 10ft lanes)
+const FD = 30, VLD = 18;        // front support zone depth, viewing lounge depth (18ft)
+// 6 lane centers along X (7.5ft safety aisles each side, 10ft lanes — Option B)
+const LX  = [-25,-15,-5,5,15,25];
 const LZf = 30,   // front edge of lane zone (= back of support zone)
       LZb = -60,  // back edge of lane zone
       LZc = -15;  // center of lane zone ((30+(-60))/2)
@@ -255,9 +256,10 @@ function DL(x1,y1,z1,x2,y2,z2,lbl,col=0xFF6D00){
 DL(-W/2,0.5,D/2+4,W/2,0.5,D/2+4,'75 ft wide',0xF9A825);
 DL(-W/2-4,0.5,D/2,-W/2-4,0.5,-D/2,'120 ft deep',0xF9A825);
 DL(-W/2-4,0.2,-D/2,-W/2-4,H,-D/2,'20 ft ceiling',0xFF6D00);
-DL(LX[0]-LW/2,0.5,LZf+4,LX[0]+LW/2,0.5,LZf+4,'12 ft lane',0x42A5F5);
+DL(LX[0]-LW/2,0.5,LZf+4,LX[0]+LW/2,0.5,LZf+4,'10 ft lane',0x42A5F5);
 DL(LX[0]-LW/2-2,0.5,LZf,LX[0]-LW/2-2,0.5,LZb,'90 ft',0x42A5F5);
-DL(-LW*3,0.5,LZf+7,0,0.5,LZf+7,'36 ft court',0xF9A825);
+DL(-LW*3,0.5,LZf+7,0,0.5,LZf+7,'30 ft court',0xF9A825);
+DL(-W/2,0.5,LZf+10,-W/2+7.5,0.5,LZf+10,'7.5 ft aisle',0x9C27B0);
 DL(W/2+3,0.5,D/2,W/2+3,0.5,LZf,'30 ft support',0x9C27B0);
 DL(W/2+3,0.5,LZf,W/2+3,0.5,LZf-VLD,'18 ft lounge',0x1565C0);
 let dimsVis=false;
@@ -306,7 +308,7 @@ const sx=sc.getContext('2d');sx.fillStyle='#1B5E20';sx.fillRect(0,0,1024,256);
 sx.strokeStyle='#F9A825';sx.lineWidth=5;sx.strokeRect(8,8,1008,240);
 sx.fillStyle='#F9A825';sx.font='bold 72px Arial';sx.textAlign='center';sx.fillText('ICC SPORTS AZ',512,108);
 sx.fillStyle='#fff';sx.font='38px Arial';sx.fillText('Indoor Cricket Club — North Phoenix, AZ',512,168);
-sx.fillStyle='#a5d6a7';sx.font='24px Arial';sx.fillText('Where Phoenix Plays Cricket  ·  9,000 SF  ·  6 Lanes',512,214);
+sx.fillStyle='#a5d6a7';sx.font='24px Arial';sx.fillText('Where Phoenix Plays Cricket  ·  9,000 SF  ·  6 Lanes  ·  Code Compliant',512,214);
 const st=new THREE.CanvasTexture(sc);st.colorSpace=THREE.SRGBColorSpace;
 const sm=new THREE.Mesh(new THREE.PlaneGeometry(22,5.5),new THREE.MeshBasicMaterial({map:st,side:THREE.DoubleSide}));
 sm.position.set(0,16.2,D/2-0.25);scene.add(sm);
@@ -316,19 +318,20 @@ inc(8);
 const roomD=D/2-(LZf+VLD);        // = 12ft
 const SZ=LZf+VLD+roomD/2;         // = 54 (center of back room zone)
 const roomDef=[
-  {nm:'Equipment Storage',   dc:'144 SF — cricket gear, maintenance, storage.',          col:0x1B5E20, ax:-31.5, aw:12},
-  {nm:'Reception + Pro Shop',dc:'360 SF — check-in, booking & gear sales. One staff.',  col:0xF9A825, ax:-10.5, aw:30},
-  {nm:'Restrooms',           dc:'180 SF — M/F, ADA compliant.',                         col:0x6a1b9a, ax: 12.0, aw:15},
-  {nm:'Back Storage',        dc:'96 SF — utility & server back-of-house.',               col:0x37474f, ax: 23.5, aw: 8},
-  {nm:'Caretaker Room',      dc:'120 SF — live-in caretaker, single bed & desk.',        col:0x4e342e, ax: 32.5, aw:10},
+  {nm:'Equipment Storage',    dc:'144 SF — cricket gear, maintenance, storage.',                col:0x1B5E20, ax:-31.5, aw:12},
+  {nm:'Reception + Pro Shop', dc:'360 SF — check-in, booking & gear sales.',                    col:0xF9A825, ax:-10.5, aw:30},
+  {nm:'Restrooms (M/F)',      dc:'276 SF — 3 WC + 1 urinal + 2 lav, ADA compliant. IBC 2902.', col:0x6a1b9a, ax: 16.0, aw:23},
+  {nm:'Back Storage',         dc:'120 SF — utility, server, mop sink.',                          col:0x37474f, ax: 33.75,aw:7.5},
 ];
 for(const rm of roomDef){
   const fM=new THREE.Mesh(new THREE.PlaneGeometry(rm.aw,roomD-0.5),new THREE.MeshStandardMaterial({color:rm.col,roughness:0.6,transparent:true,opacity:0.35}));
   fM.rotation.x=-Math.PI/2;fM.position.set(rm.ax,0.03,SZ);fM.userData={name:rm.nm,desc:rm.dc};iObj.push(fM);scene.add(fM);
   Lbl(rm.nm.split('+')[0].trim().split(' ')[0].toUpperCase(),7,rm.nm.includes('Reception')?'#F9A825':'#ffffff',rm.ax,8.5,D/2-1.5);
 }
-// Room glass partitions (3 dividers between 4 rooms)
-for(const px of [-25.5,4.5,19.5,27.5]) B(0.25,H,roomD,0xb0d8ff,px,H/2,SZ,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+// Room glass partitions (3 dividers between 4 rooms — no caretaker, restrooms expanded)
+for(const px of [-25.5,4.5,27.5]) B(0.25,H,roomD,0xb0d8ff,px,H/2,SZ,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+// Internal M/F restroom drywall divider
+B(0.3,H,roomD,0xe0e0e0,16,H/2,SZ,{r:0.7,t:0.85,ns:true});
 // Reception + Pro Shop desk (long counter, one staff manages both)
 B(24,1.1,2,0x1B5E20,-10.5,1.0,LZf+VLD+2.2,{r:0.3,n:'Reception & Pro Shop',d:'Check-in, POS, bookings + cricket gear. One staff manages both.'});
 B(24,0.12,2,0xF9A825,-10.5,1.67,LZf+VLD+2.2,{m:0.5,r:0.15,ns:true});
@@ -338,12 +341,22 @@ B(2.1,1.2,0.05,0x42a5f5,-20,4,LZf+VLD+3.15,{r:0.05,ns:true,t:0.85});
 for(let i=0;i<3;i++){B(0.2,5.5,2.5,0x1a1a2e,-19+i*4.5,2.75,LZf+VLD+8.5,{r:0.3});for(let j=0;j<4;j++)B(4,0.08,2.2,0xdddddd,-19+i*4.5,0.8+j*1.3,LZf+VLD+8.5,{ns:true});}
 // Bat wall display
 for(let i=0;i<5;i++) B(0.22,5.5,0.1,0x8d6e63,-5+i*1.8,2.75,LZf+VLD+9.5,{r:0.4});
-// Caretaker room furnishings (X: 27.5–37.5, Z: 48–60)
-B(6,0.6,3.2,0x546e7a,32.5,0.6,56.5,{r:0.5,n:'Caretaker Room',d:'Live-in caretaker — single bed & desk. 120 SF.'});
-B(5.8,0.1,3,0xeceff1,32.5,0.93,56.5,{ns:true});        // mattress
-B(2,0.22,1,0xffffff,31,1.08,54.9,{ns:true});             // pillow
-B(4,0.85,1.8,0x6d4c41,35,0.85,50.2,{r:0.4,n:'Caretaker Desk',d:'Work desk in caretaker room.'});
-B(3.8,0.06,1.6,0x9e9e9e,35,1.89,50.2,{ns:true,m:0.5}); // desk surface
+// Restroom fixtures — Men's (X: 4.5–16) and Women's (X: 16–27.5), ADA compliant per IBC 2902
+// Men's stalls
+B(3.5,4.5,0.08,0xb0bec5,8,2.25,51,{r:0.6,ns:true});     // stall partition 1
+B(3.5,4.5,0.08,0xb0bec5,12,2.25,51,{r:0.6,ns:true});     // stall partition 2
+B(1.6,3,1.2,0xffffff,7,1.5,54,{r:0.3,n:'Restroom (Men)',d:'ADA compliant. 1 WC + 1 ADA WC + 1 urinal + 1 lavatory.'});  // toilet
+B(1.6,3,1.2,0xffffff,11,1.5,54,{r:0.3});                  // ADA toilet
+B(0.5,3,0.5,0xffffff,14.5,1.5,54,{r:0.3});                // urinal
+B(2.5,0.15,1.5,0xe0e0e0,10,2.7,49.5,{r:0.2,m:0.3,ns:true}); // lavatory counter
+// Women's stalls
+B(3.5,4.5,0.08,0xb0bec5,20,2.25,51,{r:0.6,ns:true});     // stall partition 1
+B(3.5,4.5,0.08,0xb0bec5,24,2.25,51,{r:0.6,ns:true});     // stall partition 2
+B(1.6,3,1.2,0xffffff,19,1.5,54,{r:0.3,n:'Restroom (Women)',d:'ADA compliant. 1 WC + 1 ADA WC + 1 lavatory.'});
+B(1.6,3,1.2,0xffffff,23,1.5,54,{r:0.3});                  // ADA toilet
+B(2.5,0.15,1.5,0xe0e0e0,22,2.7,49.5,{r:0.2,m:0.3,ns:true}); // lavatory counter
+// ADA grab bars (visual)
+for(const gx of [11,23]) B(0.08,0.08,1.2,0xc0c0c0,gx+1.2,2.2,54.5,{m:0.7,r:0.1,ns:true});
 inc(8);
 
 // ── Expanded Viewing Lounge (Z: +30 to +48, 18ft deep desi hangout) ──────────
@@ -352,11 +365,11 @@ gw.position.set(0,H/2,LZf);scene.add(gw);
 for(const fy of [0,H/3,2*H/3,H]) B(W,0.1,0.08,0x78909c,0,fy,LZf,{ns:true,m:0.8,r:0.2});
 // Lane-front bench — cricket side of glass, run-up start, players sit facing the nets
 for(let i=0;i<LN;i++){const lx=LX[i];
-  B(10,0.45,1.5,0x1B5E20,lx,0.45,LZf-1.1,{r:0.65,n:'Lane Bench',d:'Run-up start bench — sit facing nets, store bags under seat.'});
-  B(9.8,0.1,1.4,0xF9A825,lx,0.68,LZf-1.1,{ns:true});     // gold cushion
-  B(10,1.2,0.2,0x1B5E20,lx,1.15,LZf-0.25,{r:0.6});        // backrest flush against glass (cricket side)
-  B(0.15,0.9,1.5,0x263238,lx-5.1,0.55,LZf-1.1,{r:0.3});  // left leg
-  B(0.15,0.9,1.5,0x263238,lx+5.1,0.55,LZf-1.1,{r:0.3});  // right leg
+  B(8,0.45,1.5,0x1B5E20,lx,0.45,LZf-1.1,{r:0.65,n:'Lane Bench',d:'Run-up start bench — sit facing nets, store bags under seat.'});
+  B(7.8,0.1,1.4,0xF9A825,lx,0.68,LZf-1.1,{ns:true});     // gold cushion
+  B(8,1.2,0.2,0x1B5E20,lx,1.15,LZf-0.25,{r:0.6});         // backrest flush against glass (cricket side)
+  B(0.15,0.9,1.5,0x263238,lx-4.1,0.55,LZf-1.1,{r:0.3});  // left leg
+  B(0.15,0.9,1.5,0x263238,lx+4.1,0.55,LZf-1.1,{r:0.3});  // right leg
 }
 // Gang hangout zone — left corner L-booth
 B(1.5,0.45,10,0x37474f,-W/2+1.3,0.45,LZf+9,{r:0.5,n:'Corner Booth',d:'Gang hangout corner booth — left side.'});
@@ -400,7 +413,7 @@ const sR=new THREE.Mesh(new THREE.PlaneGeometry(6.8,3.8),scM);sR.position.set(W/
 // Lounge floor tint
 const vlF=new THREE.Mesh(new THREE.PlaneGeometry(W,VLD),new THREE.MeshStandardMaterial({color:0x1a237e,transparent:true,opacity:0.18}));
 vlF.rotation.x=-Math.PI/2;vlF.position.set(0,0.02,LZf+VLD/2);scene.add(vlF);
-Lbl('VIEWING LOUNGE  —  75 x 18 ft  |  Corner Booths  |  2x65" TVs  |  Vending',11,'#90caf9',0,13,LZf+VLD/2);
+Lbl('VIEWING LOUNGE  —  75 x 18 ft  |  Corner Booths  |  2x65" TVs  |  ADA Fountain',11,'#90caf9',0,13,LZf+VLD/2);
 // Separator glass wall between lounge and back rooms
 B(W,H,0.25,0xb0d8ff,0,H/2,LZf+VLD+0.15,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
 inc(6);
@@ -413,7 +426,7 @@ for(let i=0;i<LN;i++){
   const lx=LX[i],isR=(i>=3);
   const turf=new THREE.Mesh(new THREE.PlaneGeometry(LW-0.2,LL),new THREE.MeshStandardMaterial({color:isR?0x558B2F:0x2E7D32,roughness:0.55}));
   turf.rotation.x=-Math.PI/2;turf.position.set(lx,0.03,LZc);turf.receiveShadow=true;
-  turf.userData={name:`Lane ${i+1}`,desc:`12 × 90 ft. ${isR?'Converts to box cricket court.':'Individual practice lane.'}`};
+  turf.userData={name:`Lane ${i+1}`,desc:`10 × 90 ft. ${isR?'Converts to box cricket court.':'Individual practice lane.'}`};
   iObj.push(turf);turfMeshes.push(turf);scene.add(turf);
   // Pitch strip
   const ps=new THREE.Mesh(new THREE.PlaneGeometry(2,LL),new THREE.MeshStandardMaterial({color:0x8d6e63,roughness:0.45,transparent:true,opacity:0.4}));
@@ -451,8 +464,8 @@ inc(8);
 
 // ── Net dividers ───────────────────────────────────────────────────────────────
 const netGroups={};
-const divXPositions=[-24,-12,0,12,24]; // internal dividers (0 = center, permanent)
-for(const dx of [-36,...divXPositions,36]){
+const divXPositions=[-20,-10,0,10,20]; // internal dividers (0 = center, permanent) — 10ft lanes
+for(const dx of [-30,...divXPositions,30]){
   const grp=new THREE.Group();scene.add(grp);
   if(divXPositions.includes(dx))netGroups[dx]=grp;
   const isCenter=(dx===0),isOuter=(Math.abs(dx)===36);
@@ -472,7 +485,7 @@ for(const dx of [-36,...divXPositions,36]){
 }
 // End nets
 for(const ez of [LZf,LZb]){
-  const en=new THREE.Mesh(new THREE.PlaneGeometry(72,H-0.8,15,10),new THREE.MeshStandardMaterial({color:0x90a4ae,transparent:true,opacity:0.06,side:THREE.DoubleSide,wireframe:true}));
+  const en=new THREE.Mesh(new THREE.PlaneGeometry(60,H-0.8,15,10),new THREE.MeshStandardMaterial({color:0x90a4ae,transparent:true,opacity:0.06,side:THREE.DoubleSide,wireframe:true}));
   en.position.set(0,H/2,ez);scene.add(en);
 }
 inc(8);
@@ -508,14 +521,14 @@ function makeBoxCourt(cx,lineCol){
 }
 // Turf overlays (color tint)
 const rcO=new THREE.Mesh(new THREE.PlaneGeometry(LW*3,LL),new THREE.MeshStandardMaterial({color:0xF57F17,transparent:true,opacity:0,roughness:0.5}));
-rcO.rotation.x=-Math.PI/2;rcO.position.set(18,0.055,LZc);scene.add(rcO);
-const rcL=makeBoxCourt(18,0xFFD54F);
-const rcLbl=Lbl('BOX COURT — 36×90 ft',13,'#FFD54F',18,10.5,LZc);rcLbl.visible=false;
+rcO.rotation.x=-Math.PI/2;rcO.position.set(15,0.055,LZc);scene.add(rcO);
+const rcL=makeBoxCourt(15,0xFFD54F);
+const rcLbl=Lbl('BOX COURT — 30×90 ft',13,'#FFD54F',15,10.5,LZc);rcLbl.visible=false;
 
 const lcO=new THREE.Mesh(new THREE.PlaneGeometry(LW*3,LL),new THREE.MeshStandardMaterial({color:0x0277BD,transparent:true,opacity:0,roughness:0.5}));
-lcO.rotation.x=-Math.PI/2;lcO.position.set(-18,0.055,LZc);scene.add(lcO);
-const lcL=makeBoxCourt(-18,0x64B5F6);
-const lcLbl=Lbl('BOX COURT — 36×90 ft',13,'#64B5F6',-18,10.5,LZc);lcLbl.visible=false;
+lcO.rotation.x=-Math.PI/2;lcO.position.set(-15,0.055,LZc);scene.add(lcO);
+const lcL=makeBoxCourt(-15,0x64B5F6);
+const lcLbl=Lbl('BOX COURT — 30×90 ft',13,'#64B5F6',-15,10.5,LZc);lcLbl.visible=false;
 window.__rcL=rcL;window.__lcL=lcL;window.__rightStumps=rightStumps;window.__leftStumps=leftStumps;
 inc(5);
 
@@ -531,6 +544,30 @@ ExSign(-W/2+0.7,H-1.5,0,Math.PI/2);ExSign(W/2-0.7,H-1.5,0,-Math.PI/2);ExSign(0,H
 for(const [fx,fz] of [[-W/2+1,D/4],[-W/2+1,-D/4],[W/2-1,D/4],[W/2-1,-D/4],[0,-D/2+1]])
   B(0.45,1.35,0.22,0xD32F2F,fx,2,fz,{r:0.3,ns:true});
 
+// ── Code Compliance Items (IBC 2024 / Bret Tarver / ADA) ──────────────────────
+// Panic hardware (crash bars) on all exit doors — IBC §1010.1.10
+B(2.8,0.15,0.3,0xD32F2F,-W/2+0.6,3.2,0,{r:0.3,m:0.5,n:'Panic Hardware',d:'Crash bar — IBC §1010.1.10, required for A-3 ≥50 occupants.'});
+B(2.8,0.15,0.3,0xD32F2F,W/2-0.6,3.2,0,{r:0.3,m:0.5,n:'Panic Hardware',d:'Crash bar — IBC §1010.1.10, required for A-3 ≥50 occupants.'});
+B(2.8,0.15,0.3,0xD32F2F,0,3.2,-D/2+0.3,{r:0.3,m:0.5,n:'Panic Hardware',d:'Crash bar — rear exit, IBC §1010.1.10.'});
+// Sprinkler heads — Bret Tarver Ordinance (NFPA 13 wet pipe, ~15ft spacing)
+for(let sx=-30;sx<=30;sx+=15) for(let sz=-50;sz<=50;sz+=15){
+  const sp=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.35,0.15,8),new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.3,metalness:0.5}));
+  sp.position.set(sx,H-0.08,sz);scene.add(sp);
+  const spR=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.4,6),new THREE.MeshStandardMaterial({color:0xc0c0c0,roughness:0.2,metalness:0.7}));
+  spR.position.set(sx,H-0.35,sz);scene.add(spR);
+}
+// Fire alarm pull station — IBC §907.2.1 (near main entrance)
+B(0.6,0.8,0.15,0xD32F2F,13,4,D/2-0.5,{r:0.3,n:'Fire Alarm Pull Station',d:'Manual pull station — IBC §907.2.1. Near main entrance.'});
+B(0.5,0.35,0.02,0xffffff,13,4.15,D/2-0.42,{ns:true});
+// ADA drinking fountain — IBC §2902.7 / ADA §211 (near glass wall transition)
+B(1.5,3.2,0.6,0xb0bec5,W/2-1.5,1.6,LZf+0.5,{r:0.3,m:0.4,n:'ADA Drinking Fountain',d:'Hi-lo accessible fountain — IBC §2902.7, ADA §211.'});
+B(1.2,0.08,0.5,0x90a4ae,W/2-1.5,3.22,LZf+0.5,{r:0.2,m:0.5,ns:true}); // basin top
+// Emergency lighting units — IBC §1008.3 (along egress paths)
+for(const [ex,ez] of [[-W/2+1.5,15],[-W/2+1.5,-15],[W/2-1.5,15],[W/2-1.5,-15],[-W/2+1.5,LZf+9],[W/2-1.5,LZf+9]]){
+  B(0.8,0.4,0.3,0xffffff,ex,H-1,ez,{r:0.2,ns:true,n:'Emergency Light',d:'Battery-backed — IBC §1008.3. 1 foot-candle min at floor.'});
+  B(0.15,0.15,0.3,0xffeb3b,ex-0.2,H-0.8,ez,{ns:true,r:0.1}); // left lamp
+  B(0.15,0.15,0.3,0xffeb3b,ex+0.2,H-0.8,ez,{ns:true,r:0.1}); // right lamp
+}
 inc(5);
 
 // ── Lighting ─────────────────────────────────────────────────────────────────
@@ -562,7 +599,7 @@ const modeBadge=document.getElementById('mode-badge');
 window.setMode=function(m){
   currentMode=m;
   // Internal net visibility
-  const rInner=[12,24],lInner=[-24,-12];
+  const rInner=[10,20],lInner=[-20,-10];
   for(const[dx,grp] of Object.entries(netGroups)){
     const x=parseInt(dx);
     if(x===0){grp.visible=true;continue;}
@@ -607,7 +644,7 @@ const VIEWS={
   entrance:{p:[0,14,D/2+32],t:[0,4,0]},
   birdseye:{p:[0,88,10],t:[0,0,-15]},
   lanes:{p:[-W/2-4,7,LZc+15],t:[0,3,LZc-15]},
-  court:{p:[30,16,LZc+22],t:[18,3,LZc]},
+  court:{p:[28,16,LZc+22],t:[15,3,LZc]},
   lounge:{p:[W/2-8,6,LZf+3],t:[0,4,LZf-6]},
   reception:{p:[-W/2+12,5,D/2-3],t:[-16,3,D/2-10]},
   walkin:{p:[0,6,D/2-2],t:[0,4,D/2-20]},
