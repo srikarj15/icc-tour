@@ -97,6 +97,14 @@ canvas:active { cursor:grabbing; }
   #hud .sub { display:none; }
   #mob-tog { display:flex !important; }
   #mob-mode { display:block !important; }
+  #mob-hint { display:flex !important; }
+}
+
+/* ── Landscape on small screens (height ≤ 500 px) ──────────────────────────── */
+@media(max-height:500px){
+  #specs { display:none !important; }
+  #panel { max-height:50vh; }
+  #hud h1 { font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:calc(100vw - 80px); }
 }
 </style>
 </head>
@@ -661,7 +669,7 @@ setTimeout(()=>{document.getElementById('load').classList.add('hide');animate();
 
 <!-- Mobile: floating ☰ toggle + current-mode badge -->
 <button id="mob-tog"
-  style="display:none;position:fixed;bottom:18px;right:18px;z-index:30;
+  style="display:none;position:fixed;bottom:90px;right:18px;z-index:30;
          background:#1B5E20;border:2px solid #4caf50;color:#F9A825;
          width:54px;height:54px;border-radius:50%;font-size:26px;cursor:pointer;
          align-items:center;justify-content:center;
@@ -673,6 +681,12 @@ setTimeout(()=>{document.getElementById('load').classList.add('hide');animate();
          background:#1B5E20;border:1px solid #4caf50;color:#F9A825;
          padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;
          pointer-events:none;">V1</div>
+
+<div id="mob-hint"
+  style="display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:15;
+         background:rgba(10,22,12,0.88);border:1px solid #2e5c30;
+         border-radius:8px;padding:6px 14px;font-size:10px;color:#81c784;
+         pointer-events:none;white-space:nowrap;">Pinch=Zoom &nbsp;&#183;&nbsp; Drag=Rotate</div>
 
 <script>
 // Mobile: auto-close panel 180ms after any button tap inside it
