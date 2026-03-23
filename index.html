@@ -332,15 +332,43 @@ for(const rm of roomDef){
 for(const px of [-25.5,4.5,27.5]) B(0.25,H,roomD,0xb0d8ff,px,H/2,SZ,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
 // Internal M/F restroom drywall divider
 B(0.3,H,roomD,0xe0e0e0,16,H/2,SZ,{r:0.7,t:0.85,ns:true});
-// Reception + Pro Shop desk (long counter, one staff manages both)
+// Reception + Pro Shop desk (long counter with POS terminal, monitor, and stool)
 B(24,1.1,2,0x1B5E20,-10.5,1.0,LZf+VLD+2.2,{r:0.3,n:'Reception & Pro Shop',d:'Check-in, POS, bookings + cricket gear. One staff manages both.'});
-B(24,0.12,2,0xF9A825,-10.5,1.67,LZf+VLD+2.2,{m:0.5,r:0.15,ns:true});
+B(24,0.12,2,0xF9A825,-10.5,1.67,LZf+VLD+2.2,{m:0.5,r:0.15,ns:true}); // gold counter top
+// POS terminal (Square)
+B(0.8,0.5,0.6,0x111111,-15,1.95,LZf+VLD+2,{r:0.15,m:0.3});
+B(0.7,0.02,0.55,0x42a5f5,-15,2.22,LZf+VLD+2,{ns:true,r:0.05}); // screen glow
+// Reception monitor + keyboard
 B(2.4,1.6,0.15,0x263238,-20,4,LZf+VLD+3,{r:0.15,ns:true});
 B(2.1,1.2,0.05,0x42a5f5,-20,4,LZf+VLD+3.15,{r:0.05,ns:true,t:0.85});
-// Pro shop gear racks behind counter
-for(let i=0;i<3;i++){B(0.2,5.5,2.5,0x1a1a2e,-19+i*4.5,2.75,LZf+VLD+8.5,{r:0.3});for(let j=0;j<4;j++)B(4,0.08,2.2,0xdddddd,-19+i*4.5,0.8+j*1.3,LZf+VLD+8.5,{ns:true});}
-// Bat wall display
-for(let i=0;i<5;i++) B(0.22,5.5,0.1,0x8d6e63,-5+i*1.8,2.75,LZf+VLD+9.5,{r:0.4});
+B(1.8,0.06,0.6,0x333333,-20,1.75,LZf+VLD+1.5,{ns:true}); // keyboard
+// Staff stool behind counter
+const stool=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,0.06,12),new THREE.MeshStandardMaterial({color:0x1B5E20,roughness:0.4}));
+stool.position.set(-18,1.8,LZf+VLD+3.5);scene.add(stool);
+const stoolLeg=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,1.7,6),new THREE.MeshStandardMaterial({color:0x616161,roughness:0.3,metalness:0.6}));
+stoolLeg.position.set(-18,0.9,LZf+VLD+3.5);scene.add(stoolLeg);
+// Scoreboard display above reception (digital signage)
+B(8,3,0.2,0x111111,-10.5,8,LZf+VLD+0.3,{r:0.1,m:0.3,n:'Scoreboard Display',d:'Digital signage — live scores, booking status, promotions.'});
+B(7.6,2.6,0.05,0x0d47a1,-10.5,8,LZf+VLD+0.15,{ns:true,r:0.05,t:0.9}); // screen glow
+// Pro shop gear racks behind counter (with cricket pads on shelves)
+for(let i=0;i<3;i++){
+  B(0.2,5.5,2.5,0x1a1a2e,-19+i*4.5,2.75,LZf+VLD+8.5,{r:0.3});
+  for(let j=0;j<4;j++) B(4,0.08,2.2,0xdddddd,-19+i*4.5,0.8+j*1.3,LZf+VLD+8.5,{ns:true});
+  // Cricket pads on top shelf
+  B(0.8,0.6,0.3,0xffffff,-19+i*4.5-1,4.8,LZf+VLD+8.5,{ns:true,r:0.5});
+  B(0.8,0.6,0.3,0xF9A825,-19+i*4.5+1,4.8,LZf+VLD+8.5,{ns:true,r:0.5});
+}
+// Bat wall display (cricket bats on wall pegs — angled)
+for(let i=0;i<5;i++){
+  B(0.22,4.5,0.1,0x8d6e63,-5+i*1.8,3.25,LZf+VLD+9.5,{r:0.4}); // bat body
+  B(0.3,1,0.12,0x5d4037,-5+i*1.8,5.8,LZf+VLD+9.5,{r:0.3}); // bat handle (darker)
+}
+// Helmet display shelf
+B(8,0.12,1.2,0x424242,-5+1.8*2,6.8,LZf+VLD+9.3,{r:0.2,m:0.4,ns:true});
+for(let i=0;i<3;i++){
+  const helm=new THREE.Mesh(new THREE.SphereGeometry(0.5,8,6,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:i===1?0x1B5E20:0x263238,roughness:0.3,metalness:0.4}));
+  helm.position.set(-5+i*3.6,7.35,LZf+VLD+9.3);scene.add(helm);
+}
 // Restroom fixtures — Men's (X: 4.5–16) and Women's (X: 16–27.5), ADA compliant per IBC 2902
 // Men's stalls
 B(3.5,4.5,0.08,0xb0bec5,8,2.25,51,{r:0.6,ns:true});     // stall partition 1
@@ -444,22 +472,54 @@ for(let i=0;i<LN;i++){
   }
   // Bail bar
   for(const sz of [STf,STb]) Bg(stGrp,0.6,0.07,0.07,0xD4A437,lx,2.43,sz,{ns:true});
-  // Bowling machine (L1 and L4)
+  // Bowling machine (L1 and L4) — detailed: body + wheel + feeder hopper + ball bin
   if(i===0||i===3){
-    B(1.4,2,1.4,0x424242,lx,1,STf+4,{r:0.25,m:0.6,n:'Bowling Machine',d:'Variable speed 40–90 mph. 2 machines total.'});
+    B(1.4,2,1.4,0x424242,lx,1,STf+4,{r:0.25,m:0.6,n:'Bowling Machine',d:'BOLA Professional — variable speed 40–90 mph. 2 machines total, mobile for any lane.'});
     const wh=new THREE.Mesh(new THREE.TorusGeometry(0.38,0.1,8,16),new THREE.MeshStandardMaterial({color:0xF9A825,roughness:0.3,metalness:0.6}));
     wh.position.set(lx,2.5,STf+4);wh.rotation.x=Math.PI/2;scene.add(wh);
+    // Feeder tube
+    const ft=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.2,1.2,8),new THREE.MeshStandardMaterial({color:0x616161,roughness:0.3,metalness:0.5}));
+    ft.position.set(lx,2.8,STf+3.5);ft.rotation.x=Math.PI/6;scene.add(ft);
+    // Ball bin beside machine
+    B(1.2,0.8,1.2,0x263238,lx+1.8,0.4,STf+4,{r:0.4,n:'Ball Bin',d:'Cricket balls for bowling machine. 12-ball capacity.'});
+    // 3 cricket balls in bin
+    for(const[bx,bz]of[[0,0],[0.3,0.25],[-0.25,0.15]]){
+      const cb=new THREE.Mesh(new THREE.SphereGeometry(0.18,8,8),new THREE.MeshStandardMaterial({color:0xD32F2F,roughness:0.6}));
+      cb.position.set(lx+1.8+bx,0.98,STf+4+bz);scene.add(cb);
+    }
   }
   Lbl(`L${i+1}`,4.5,isR?'#F9A825':'#81c784',lx,14.5,LZf-2);
 }
-// Run-up overlay
+// Run-up overlay (front, 12ft)
 const ruF=new THREE.Mesh(new THREE.PlaneGeometry(W-2,12),new THREE.MeshStandardMaterial({color:0x4caf50,transparent:true,opacity:0.18}));
 ruF.rotation.x=-Math.PI/2;ruF.position.set(0,0.04,LZf-6);scene.add(ruF);
 Lbl('BOWLER RUN-UP  12 ft',8,'#a5d6a7',0,0.7,LZf-6);
-// Egress overlay
-const egF=new THREE.Mesh(new THREE.PlaneGeometry(W-2,12),new THREE.MeshStandardMaterial({color:0xff6d00,transparent:true,opacity:0.13}));
-egF.rotation.x=-Math.PI/2;egF.position.set(0,0.04,LZb+6);scene.add(egF);
-Lbl('EGRESS  12 ft',7,'#ff8f00',0,0.7,LZb+6);
+
+// ── Back Egress Corridor (8ft clear zone behind nets) ─────────────────────────
+// Physical back-net barrier at Z=-52 (4ft behind back stumps) separating play area from egress
+const backBarrierZ=LZb+8; // -60+8 = -52
+B(W-2,1.2,0.15,0xff6d00,0,0.6,backBarrierZ,{r:0.4,m:0.3,n:'Back Net Barrier',d:'Safety barrier — 8ft egress corridor behind. IBC required exit path to E4.'});
+// Orange safety stripe on barrier
+B(W-2,0.08,0.17,0xF9A825,0,1.22,backBarrierZ,{ns:true,m:0.5});
+// Egress corridor floor marking (Z=-60 to Z=-52, 8ft deep)
+const egF=new THREE.Mesh(new THREE.PlaneGeometry(W-2,8),new THREE.MeshStandardMaterial({color:0xff6d00,transparent:true,opacity:0.18}));
+egF.rotation.x=-Math.PI/2;egF.position.set(0,0.04,LZb+4);scene.add(egF);
+Lbl('EGRESS CORRIDOR — 8 ft clear  ·  EXIT E4',9,'#ff8f00',0,0.7,LZb+4);
+// Directional arrows on floor pointing to rear exit
+for(const ax of[-20,0,20]){
+  const arG=new THREE.Mesh(new THREE.PlaneGeometry(1.5,2.5),new THREE.MeshBasicMaterial({color:0xff6d00,transparent:true,opacity:0.6,side:THREE.DoubleSide}));
+  arG.rotation.x=-Math.PI/2;arG.position.set(ax,0.06,LZb+4);scene.add(arG);
+}
+// Safety bollards at corridor entrances (left and right)
+for(const bx of[-W/2+2,W/2-2]){
+  const bol=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,2.8,8),new THREE.MeshStandardMaterial({color:0xF9A825,roughness:0.3,metalness:0.5}));
+  bol.position.set(bx,1.4,backBarrierZ);bol.castShadow=true;scene.add(bol);
+}
+// Back wall shelf (equipment storage along back wall in egress corridor)
+B(30,0.12,1.5,0x455a64,0,3.5,LZb+1,{r:0.3,m:0.4,ns:true});
+// First aid kit on back wall
+B(1.2,1.5,0.3,0xffffff,-10,4.5,LZb+0.2,{r:0.3,n:'First Aid Kit',d:'Wall-mounted first aid kit. Checked monthly. At least 1 CPR-certified staff on duty.'});
+B(1,0.8,0.05,0xD32F2F,-10,4.7,LZb+0.05,{ns:true}); // red cross
 inc(8);
 
 // ── Net dividers ───────────────────────────────────────────────────────────────
