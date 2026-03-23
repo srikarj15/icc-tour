@@ -347,10 +347,7 @@ sx.fillStyle='#81c784';sx.font='22px Arial';sx.fillText('Indoor Cricket Club  ·
 sx.fillStyle='#F9A825';sx.font='18px Arial';sx.fillText('iccsportsaz.com',512,142);
 const st=new THREE.CanvasTexture(sc);st.colorSpace=THREE.SRGBColorSpace;
 const sm=new THREE.Mesh(new THREE.PlaneGeometry(20,3.2),new THREE.MeshBasicMaterial({map:st,side:THREE.DoubleSide}));
-sm.position.set(0,H-1.8,D/2+0.2);scene.add(sm);
-
-// No plants, no canopy, no interior welcome sign, no mat text.
-// The clean glass and warm spotlight draw you in. Reception desk is the wayfinding.
+sm.position.set(0,H-1.5,D/2+1.5);scene.add(sm); // sign 1.5ft out from wall — clearly exterior
 inc(8);
 
 // ── Support zone back rooms (Z: +48 to +60, 12ft deep) ───────────────────────
@@ -367,63 +364,55 @@ for(const rm of roomDef){
   fM.rotation.x=-Math.PI/2;fM.position.set(rm.ax,0.03,SZ);fM.userData={name:rm.nm,desc:rm.dc};iObj.push(fM);scene.add(fM);
   Lbl(rm.nm.split('+')[0].trim().split(' ')[0].toUpperCase(),7,rm.nm.includes('Reception')?'#F9A825':'#ffffff',rm.ax,8.5,D/2-1.5);
 }
-// Room glass partitions (3 dividers between 4 rooms — no caretaker, restrooms expanded)
-for(const px of [-25.5,4.5,27.5]) B(0.25,H,roomD,0xb0d8ff,px,H/2,SZ,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+// ── Room dividers ─────────────────────────────────────────────────────────────
+// Equipment | Reception: glass partition
+B(0.25,H,roomD,0xb0d8ff,-25.5,H/2,SZ,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+// Reception | Restrooms: OPAQUE WALL (restroom internals hidden from entrance)
+B(0.3,H,roomD,0xf0f0f0,4.5,H/2,SZ,{r:0.75});
+// Restrooms | Back Storage: opaque wall
+B(0.3,H,roomD,0xf0f0f0,27.5,H/2,SZ,{r:0.75});
 // Internal M/F restroom drywall divider
-B(0.3,H,roomD,0xe0e0e0,16,H/2,SZ,{r:0.7,t:0.85,ns:true});
-// Reception + Pro Shop desk (long counter with POS terminal, monitor, and stool)
-B(24,1.1,2,0x1B5E20,-10.5,1.0,LZf+VLD+2.2,{r:0.3,n:'Reception & Pro Shop',d:'Check-in, POS, bookings + cricket gear. One staff manages both.'});
-B(24,0.12,2,0xF9A825,-10.5,1.67,LZf+VLD+2.2,{m:0.5,r:0.15,ns:true}); // gold counter top
-// POS terminal (Square)
-B(0.8,0.5,0.6,0x111111,-15,1.95,LZf+VLD+2,{r:0.15,m:0.3});
-B(0.7,0.02,0.55,0x42a5f5,-15,2.22,LZf+VLD+2,{ns:true,r:0.05}); // screen glow
-// Reception monitor + keyboard
-B(2.4,1.6,0.15,0x263238,-20,4,LZf+VLD+3,{r:0.15,ns:true});
-B(2.1,1.2,0.05,0x42a5f5,-20,4,LZf+VLD+3.15,{r:0.05,ns:true,t:0.85});
-B(1.8,0.06,0.6,0x333333,-20,1.75,LZf+VLD+1.5,{ns:true}); // keyboard
-// Staff stool behind counter
-const stool=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,0.06,12),new THREE.MeshStandardMaterial({color:0x1B5E20,roughness:0.4}));
-stool.position.set(-18,1.8,LZf+VLD+3.5);scene.add(stool);
-const stoolLeg=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.08,1.7,6),new THREE.MeshStandardMaterial({color:0x616161,roughness:0.3,metalness:0.6}));
-stoolLeg.position.set(-18,0.9,LZf+VLD+3.5);scene.add(stoolLeg);
-// Scoreboard display above reception (digital signage)
-B(8,3,0.2,0x111111,-10.5,8,LZf+VLD+0.3,{r:0.1,m:0.3,n:'Scoreboard Display',d:'Digital signage — live scores, booking status, promotions.'});
-B(7.6,2.6,0.05,0x0d47a1,-10.5,8,LZf+VLD+0.15,{ns:true,r:0.05,t:0.9}); // screen glow
-// Pro shop gear racks behind counter (with cricket pads on shelves)
-for(let i=0;i<3;i++){
-  B(0.2,5.5,2.5,0x1a1a2e,-19+i*4.5,2.75,LZf+VLD+8.5,{r:0.3});
-  for(let j=0;j<4;j++) B(4,0.08,2.2,0xdddddd,-19+i*4.5,0.8+j*1.3,LZf+VLD+8.5,{ns:true});
-  // Cricket pads on top shelf
-  B(0.8,0.6,0.3,0xffffff,-19+i*4.5-1,4.8,LZf+VLD+8.5,{ns:true,r:0.5});
-  B(0.8,0.6,0.3,0xF9A825,-19+i*4.5+1,4.8,LZf+VLD+8.5,{ns:true,r:0.5});
-}
-// Bat wall display (cricket bats on wall pegs — angled)
-for(let i=0;i<5;i++){
-  B(0.22,4.5,0.1,0x8d6e63,-5+i*1.8,3.25,LZf+VLD+9.5,{r:0.4}); // bat body
-  B(0.3,1,0.12,0x5d4037,-5+i*1.8,5.8,LZf+VLD+9.5,{r:0.3}); // bat handle (darker)
-}
-// Helmet display shelf
-B(8,0.12,1.2,0x424242,-5+1.8*2,6.8,LZf+VLD+9.3,{r:0.2,m:0.4,ns:true});
-for(let i=0;i<3;i++){
-  const helm=new THREE.Mesh(new THREE.SphereGeometry(0.5,8,6,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:i===1?0x1B5E20:0x263238,roughness:0.3,metalness:0.4}));
-  helm.position.set(-5+i*3.6,7.35,LZf+VLD+9.3);scene.add(helm);
-}
-// Restroom fixtures — Men's (X: 4.5–16) and Women's (X: 16–27.5), ADA compliant per IBC 2902
-// Men's stalls
-B(3.5,4.5,0.08,0xb0bec5,8,2.25,51,{r:0.6,ns:true});     // stall partition 1
-B(3.5,4.5,0.08,0xb0bec5,12,2.25,51,{r:0.6,ns:true});     // stall partition 2
-B(1.6,3,1.2,0xffffff,7,1.5,54,{r:0.3,n:'Restroom (Men)',d:'ADA compliant. 1 WC + 1 ADA WC + 1 urinal + 1 lavatory.'});  // toilet
-B(1.6,3,1.2,0xffffff,11,1.5,54,{r:0.3});                  // ADA toilet
-B(0.5,3,0.5,0xffffff,14.5,1.5,54,{r:0.3});                // urinal
-B(2.5,0.15,1.5,0xe0e0e0,10,2.7,49.5,{r:0.2,m:0.3,ns:true}); // lavatory counter
-// Women's stalls
-B(3.5,4.5,0.08,0xb0bec5,20,2.25,51,{r:0.6,ns:true});     // stall partition 1
-B(3.5,4.5,0.08,0xb0bec5,24,2.25,51,{r:0.6,ns:true});     // stall partition 2
-B(1.6,3,1.2,0xffffff,19,1.5,54,{r:0.3,n:'Restroom (Women)',d:'ADA compliant. 1 WC + 1 ADA WC + 1 lavatory.'});
-B(1.6,3,1.2,0xffffff,23,1.5,54,{r:0.3});                  // ADA toilet
-B(2.5,0.15,1.5,0xe0e0e0,22,2.7,49.5,{r:0.2,m:0.3,ns:true}); // lavatory counter
-// ADA grab bars (visual)
-for(const gx of [11,23]) B(0.08,0.08,1.2,0xc0c0c0,gx+1.2,2.2,54.5,{m:0.7,r:0.1,ns:true});
+B(0.3,H,roomD,0xe0e0e0,16,H/2,SZ,{r:0.7});
+// Restroom door signs (on the opaque wall face, visible from reception side)
+Lbl('RESTROOMS',4,'#ffffff',4.5,6,LZf+VLD+1);
+
+// ── Reception — Receptionist Faces the Entrance ─────────────────────────────
+// Counter near entrance wall (Z ≈ D/2-4), receptionist sits behind looking at door.
+// Pro shop display on the BACK wall (Z ≈ LZf+VLD+0.5) behind the receptionist.
+// Walk-in flow: enter → see counter immediately to left → check in → walk through to lounge.
+
+// Reception counter — 14ft wide, positioned 4ft from entrance wall, facing the door
+const rcZ=D/2-4; // counter Z position (4ft from entrance)
+B(14,1.1,2.2,0x1B5E20,-14,1.0,rcZ,{r:0.3,n:'Reception & Pro Shop',d:'Check-in, POS, bookings + gear. Receptionist faces entrance.'});
+B(14,0.12,2.2,0xF9A825,-14,1.67,rcZ,{m:0.5,r:0.15,ns:true}); // gold counter top
+// Short side return (guides visitors along the counter)
+B(2,1.1,4,0x1B5E20,-6.5,1.0,rcZ-2,{r:0.3});
+B(2,0.12,4,0xF9A825,-6.5,1.67,rcZ-2,{m:0.5,r:0.15,ns:true});
+
+// POS terminal on counter (faces entrance — customer can see screen)
+B(0.8,0.5,0.6,0x111111,-12,1.95,rcZ+0.5,{r:0.15,m:0.3});
+B(0.7,0.02,0.55,0x42a5f5,-12,2.22,rcZ+0.5,{ns:true,r:0.05});
+
+// Booking monitor — wall-mounted on back wall behind receptionist (faces entrance)
+B(3,2,0.15,0x111111,-14,6,LZf+VLD+0.5,{r:0.1,m:0.3,n:'Scoreboard Display',d:'Digital signage — live scores, booking status.'});
+B(2.7,1.7,0.05,0x0d47a1,-14,6,LZf+VLD+0.65,{ns:true,r:0.05,t:0.9});
+
+// Pro shop display — back wall behind receptionist (3 bats + small shelf)
+for(let i=0;i<3;i++) B(0.2,3.5,0.1,0x8d6e63,-22+i*2.5,4,LZf+VLD+0.5,{r:0.4});
+B(8,0.1,1,0x424242,-19,2,LZf+VLD+0.8,{r:0.2,m:0.4,ns:true});
+
+// Open walk-through space between counter and lounge — clear sightline to the lanes
+
+// Restroom fixtures — BEHIND opaque wall (not visible from entrance)
+// Men's (X: 4.5–16)
+B(1.4,2.5,1,0xffffff,8,1.25,54,{r:0.3,n:'Restroom (Men)',d:'ADA compliant. 1 WC + 1 ADA WC + 1 urinal + 1 lav.'});
+B(1.4,2.5,1,0xffffff,12,1.25,54,{r:0.3});
+B(0.5,2.5,0.5,0xffffff,14.5,1.25,54,{r:0.3});
+B(2.5,0.12,1.2,0xe0e0e0,10,2.6,49.5,{r:0.2,m:0.3,ns:true});
+// Women's (X: 16–27.5)
+B(1.4,2.5,1,0xffffff,20,1.25,54,{r:0.3,n:'Restroom (Women)',d:'ADA compliant. 1 WC + 1 ADA WC + 1 lav.'});
+B(1.4,2.5,1,0xffffff,24,1.25,54,{r:0.3});
+B(2.5,0.12,1.2,0xe0e0e0,22,2.6,49.5,{r:0.2,m:0.3,ns:true});
 inc(8);
 
 // ── Expanded Viewing Lounge (Z: +30 to +48, 18ft deep desi hangout) ──────────
