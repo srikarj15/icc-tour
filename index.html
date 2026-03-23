@@ -298,29 +298,31 @@ const wM=new THREE.MeshStandardMaterial({color:0xf0f0f0,roughness:0.75});
 const bkW=new THREE.Mesh(new THREE.PlaneGeometry(W,H),wM.clone());bkW.position.set(0,H/2,-D/2);scene.add(bkW);
 const lw=new THREE.Mesh(new THREE.PlaneGeometry(D,H),wM.clone());lw.position.set(-W/2,H/2,0);lw.rotation.y=Math.PI/2;scene.add(lw);
 const rw=new THREE.Mesh(new THREE.PlaneGeometry(D,H),wM.clone());rw.position.set(W/2,H/2,0);rw.rotation.y=-Math.PI/2;scene.add(rw);
-// ── Entrance Facade — Clean Storefront (office-grade, minimal) ─────────────────
-// Design principle: clear sightline through glass → reception desk is the focal point.
-// Three elements only: green wall panels, full-height glass, one exterior sign.
+// ── Entrance Facade — Glass shows ONLY reception, restrooms behind solid wall ──
+// Glass: X=-15 to +5 (20ft) — reception only.
+// Solid wall: X=+5 to +15 — hides restrooms from outside.
+// This is the proper architectural fix — the entrance reveals one clean space.
 
-// Front wall solid panels (dark green, flanking the glass center)
-B(W/2-15,H,0.4,0x1B5E20,-W/4-7.5,H/2,D/2,{r:0.5});
-B(W/2-15,H,0.4,0x1B5E20, W/4+7.5,H/2,D/2,{r:0.5});
+// Front wall solid panels (dark green)
+B(W/2-15,H,0.4,0x1B5E20,-W/4-7.5,H/2,D/2,{r:0.5});    // far left solid
+B(W/2-15,H,0.4,0x1B5E20, W/4+7.5,H/2,D/2,{r:0.5});    // far right solid
+B(10,H,0.4,0x1B5E20,10,H/2,D/2,{r:0.5});                 // restroom cover panel (X=5 to 15)
 
-// Full-height glass storefront (30ft wide, floor-to-ceiling frameless look)
+// Glass storefront (20ft wide: X=-15 to +5, shows reception only)
 const gm=new THREE.MeshStandardMaterial({color:0xc8e6ff,transparent:true,opacity:0.1,roughness:0.01,metalness:0.08,side:THREE.DoubleSide});
-const gFull=new THREE.Mesh(new THREE.PlaneGeometry(30,H),gm);gFull.position.set(0,H/2,D/2-0.05);scene.add(gFull);
+const gFull=new THREE.Mesh(new THREE.PlaneGeometry(20,H),gm);gFull.position.set(-5,H/2,D/2-0.05);scene.add(gFull);
 
-// Minimal aluminum frame — just outer perimeter + one center mullion
+// Minimal aluminum frame
 const fCol=0xb0b0b0;
 B(0.2,H,0.2,fCol,-15,H/2,D/2,{r:0.12,m:0.75,ns:true});   // left frame
-B(0.2,H,0.2,fCol, 15,H/2,D/2,{r:0.12,m:0.75,ns:true});   // right frame
-B(0.15,H,0.15,fCol,0,H/2,D/2,{r:0.12,m:0.75,ns:true});    // center mullion
-B(30.4,0.2,0.2,fCol,0,H,D/2,{r:0.12,m:0.75,ns:true});     // top header
-B(30.4,0.12,0.2,fCol,0,0.06,D/2,{r:0.12,m:0.75,ns:true}); // bottom sill
+B(0.2,H,0.2,fCol,  5,H/2,D/2,{r:0.12,m:0.75,ns:true});   // right frame (moved from 15 to 5)
+B(0.15,H,0.15,fCol,-5,H/2,D/2,{r:0.12,m:0.75,ns:true});   // center mullion
+B(20.4,0.2,0.2,fCol,-5,H,D/2,{r:0.12,m:0.75,ns:true});    // top header
+B(20.4,0.12,0.2,fCol,-5,0.06,D/2,{r:0.12,m:0.75,ns:true});// bottom sill
 
-// Subtle green accent pillars at glass edge (slim, not chunky)
+// Green accent pillars at glass edges
 B(0.6,H,0.6,0x1B5E20,-15.3,H/2,D/2,{r:0.4,m:0.2});
-B(0.6,H,0.6,0x1B5E20, 15.3,H/2,D/2,{r:0.4,m:0.2});
+B(0.6,H,0.6,0x1B5E20,  5.3,H/2,D/2,{r:0.4,m:0.2});
 
 // Thin gold accent strip at baseboard (interior, all walls — subtle)
 B(W,0.5,0.06,0xF9A825,0,0.25,D/2-0.15,{ns:true,m:0.5,r:0.1});
@@ -347,7 +349,7 @@ sx.fillStyle='#81c784';sx.font='22px Arial';sx.fillText('Indoor Cricket Club  ·
 sx.fillStyle='#F9A825';sx.font='18px Arial';sx.fillText('iccsportsaz.com',512,142);
 const st=new THREE.CanvasTexture(sc);st.colorSpace=THREE.SRGBColorSpace;
 const sm=new THREE.Mesh(new THREE.PlaneGeometry(20,3.2),new THREE.MeshBasicMaterial({map:st,side:THREE.DoubleSide}));
-sm.position.set(0,H-1.5,D/2+1.5);scene.add(sm); // sign 1.5ft out from wall — clearly exterior
+sm.position.set(-5,H-1.5,D/2+1.5);scene.add(sm); // sign centered above glass opening, clearly exterior
 inc(8);
 
 // ── Support zone back rooms (Z: +48 to +60, 12ft deep) ───────────────────────
@@ -362,7 +364,11 @@ const roomDef=[
 for(const rm of roomDef){
   const fM=new THREE.Mesh(new THREE.PlaneGeometry(rm.aw,roomD-0.5),new THREE.MeshStandardMaterial({color:rm.col,roughness:0.6,transparent:true,opacity:0.35}));
   fM.rotation.x=-Math.PI/2;fM.position.set(rm.ax,0.03,SZ);fM.userData={name:rm.nm,desc:rm.dc};iObj.push(fM);scene.add(fM);
-  Lbl(rm.nm.split('+')[0].trim().split(' ')[0].toUpperCase(),7,rm.nm.includes('Reception')?'#F9A825':'#ffffff',rm.ax,8.5,D/2-1.5);
+  // Only show labels for rooms visible from entrance (Equipment + Reception)
+  // Restrooms + Back Storage labels go BEHIND the front wall (Z=SZ, inside the room)
+  const isHidden=rm.nm.includes('Restroom')||rm.nm.includes('Back Storage');
+  if(!isHidden) Lbl(rm.nm.split('+')[0].trim().split(' ')[0].toUpperCase(),7,rm.nm.includes('Reception')?'#F9A825':'#ffffff',rm.ax,8.5,D/2-1.5);
+  else Lbl(rm.nm.split('+')[0].trim().split(' ')[0].toUpperCase(),5,'#ffffff',rm.ax,8.5,SZ); // label inside room, behind wall
 }
 // ── Room dividers ─────────────────────────────────────────────────────────────
 // Equipment | Reception: glass partition (side wall)
@@ -374,15 +380,12 @@ B(0.3,H,roomD,0xf0f0f0,27.5,H/2,SZ,{r:0.75});
 // Internal M/F restroom drywall divider
 B(0.3,H,roomD,0xe0e0e0,16,H/2,SZ,{r:0.7});
 
-// CRITICAL: Front wall for restrooms + back storage (blocks view from entrance/lounge)
-// This wall runs along Z=LZf+VLD (=48), covering X: +4.5 to +37.5
-// Only reception (X: -25.5 to +4.5) is open to the lounge/entrance
-B(33,H,0.3,0xf0f0f0,20.5,H/2,LZf+VLD,{r:0.75});
-// Restroom door (small gap indicated by signage, door on the lounge side)
-Lbl('RESTROOMS  →',4,'#ffffff',8,5.5,LZf+VLD-0.5);
-// Door frame visual (2.8ft wide opening at X≈8)
-B(1,H,0.3,0xf0f0f0,5.2,H/2,LZf+VLD,{r:0.75}); // left of door
-B(0.15,7.5,0.3,0x9e9e9e,6.4,3.75,LZf+VLD,{r:0.2,m:0.6,ns:true}); // door frame
+// CRITICAL: Front wall for restrooms + back storage (blocks ALL view from entrance/lounge)
+// THICK solid wall at Z=LZf+VLD (=48), covering full span X: +4.5 to +37.5
+// No gaps, no door opening — restroom access is from the side corridor only
+B(33.5,H,0.8,0xf0f0f0,20.75,H/2,LZf+VLD,{r:0.75});
+// "RESTROOMS" sign on the wall face (lounge-facing side, subtle)
+Lbl('RESTROOMS',3.5,'#9e9e9e',16,5.5,LZf+VLD-0.5);
 
 // ── Reception — Receptionist Faces the Entrance ─────────────────────────────
 // Counter near entrance wall (Z ≈ D/2-4), receptionist sits behind looking at door.
