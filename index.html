@@ -673,5 +673,27 @@ setTimeout(()=>{document.getElementById('load').classList.add('hide');animate();
          background:#1B5E20;border:1px solid #4caf50;color:#F9A825;
          padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;
          pointer-events:none;">V1</div>
+
+<script>
+// Mobile: auto-close panel 180ms after any button tap inside it
+(function(){
+  function closeMobPanel(){
+    var p=document.getElementById('panel');
+    var t=document.getElementById('mob-tog');
+    if(p){p.classList.remove('mob-open');}
+    if(t){t.textContent='☰';}
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    var panel=document.getElementById('panel');
+    if(panel){
+      panel.addEventListener('click',function(e){
+        if(e.target.tagName==='BUTTON'){
+          setTimeout(closeMobPanel,180);
+        }
+      });
+    }
+  });
+})();
+</script>
 </body>
 </html>
