@@ -365,16 +365,24 @@ for(const rm of roomDef){
   Lbl(rm.nm.split('+')[0].trim().split(' ')[0].toUpperCase(),7,rm.nm.includes('Reception')?'#F9A825':'#ffffff',rm.ax,8.5,D/2-1.5);
 }
 // ── Room dividers ─────────────────────────────────────────────────────────────
-// Equipment | Reception: glass partition
+// Equipment | Reception: glass partition (side wall)
 B(0.25,H,roomD,0xb0d8ff,-25.5,H/2,SZ,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
-// Reception | Restrooms: OPAQUE WALL (restroom internals hidden from entrance)
+// Reception | Restrooms: OPAQUE side wall
 B(0.3,H,roomD,0xf0f0f0,4.5,H/2,SZ,{r:0.75});
-// Restrooms | Back Storage: opaque wall
+// Restrooms | Back Storage: opaque side wall
 B(0.3,H,roomD,0xf0f0f0,27.5,H/2,SZ,{r:0.75});
 // Internal M/F restroom drywall divider
 B(0.3,H,roomD,0xe0e0e0,16,H/2,SZ,{r:0.7});
-// Restroom door signs (on the opaque wall face, visible from reception side)
-Lbl('RESTROOMS',4,'#ffffff',4.5,6,LZf+VLD+1);
+
+// CRITICAL: Front wall for restrooms + back storage (blocks view from entrance/lounge)
+// This wall runs along Z=LZf+VLD (=48), covering X: +4.5 to +37.5
+// Only reception (X: -25.5 to +4.5) is open to the lounge/entrance
+B(33,H,0.3,0xf0f0f0,20.5,H/2,LZf+VLD,{r:0.75});
+// Restroom door (small gap indicated by signage, door on the lounge side)
+Lbl('RESTROOMS  →',4,'#ffffff',8,5.5,LZf+VLD-0.5);
+// Door frame visual (2.8ft wide opening at X≈8)
+B(1,H,0.3,0xf0f0f0,5.2,H/2,LZf+VLD,{r:0.75}); // left of door
+B(0.15,7.5,0.3,0x9e9e9e,6.4,3.75,LZf+VLD,{r:0.2,m:0.6,ns:true}); // door frame
 
 // ── Reception — Receptionist Faces the Entrance ─────────────────────────────
 // Counter near entrance wall (Z ≈ D/2-4), receptionist sits behind looking at door.
@@ -397,11 +405,9 @@ B(0.7,0.02,0.55,0x42a5f5,-12,2.22,rcZ+0.5,{ns:true,r:0.05});
 B(3,2,0.15,0x111111,-14,6,LZf+VLD+0.5,{r:0.1,m:0.3,n:'Scoreboard Display',d:'Digital signage — live scores, booking status.'});
 B(2.7,1.7,0.05,0x0d47a1,-14,6,LZf+VLD+0.65,{ns:true,r:0.05,t:0.9});
 
-// Pro shop display — back wall behind receptionist (3 bats + small shelf)
-for(let i=0;i<3;i++) B(0.2,3.5,0.1,0x8d6e63,-22+i*2.5,4,LZf+VLD+0.5,{r:0.4});
-B(8,0.1,1,0x424242,-19,2,LZf+VLD+0.8,{r:0.2,m:0.4,ns:true});
-
-// Open walk-through space between counter and lounge — clear sightline to the lanes
+// Pro shop: compact wall-mounted display INSIDE reception (behind counter, low profile)
+// Only a small shelf at waist height — not visible from entrance eye level
+B(10,0.1,1.2,0x424242,-16,1.1,LZf+VLD+0.8,{r:0.2,m:0.4,ns:true}); // low shelf behind counter
 
 // Restroom fixtures — BEHIND opaque wall (not visible from entrance)
 // Men's (X: 4.5–16)
