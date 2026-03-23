@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICC Sports AZ — 3D Virtual Tour v5</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { overflow:hidden; background:#0d1a10; font-family:'Segoe UI',system-ui,sans-serif; }
+canvas { display:block; cursor:grab; }
+canvas:active { cursor:grabbing; }
+
+#hud {
+  position:fixed; top:0; left:0; right:0; z-index:10; pointer-events:none;
+  background:linear-gradient(180deg,rgba(13,26,16,0.97) 0%,transparent 100%);
+  padding:12px 20px 28px;
+}
+#hud h1 { font-size:15px; font-weight:800; color:#F9A825; letter-spacing:0.5px; }
+#hud .sub { font-size:10px; color:#81c784; margin-top:2px; }
+
+#panel { position:fixed; left:12px; top:55px; z-index:10; width:162px; }
+.pane {
+  background:rgba(10,22,12,0.92); border:1px solid #2e5c30;
+  border-radius:10px; padding:9px; margin-bottom:7px;
+  box-shadow:0 2px 16px rgba(0,0,0,0.35); backdrop-filter:blur(10px);
+}
+.pane h3 { font-size:8.5px; font-weight:700; color:#F9A825; margin-bottom:6px; text-transform:uppercase; letter-spacing:1.5px; }
+.pane button {
+  display:block; width:100%; background:rgba(255,255,255,0.05);
+  border:1px solid #2e5c30; color:#81c784; padding:5px 8px;
+  margin-bottom:3px; border-radius:5px; font-size:10.5px; cursor:pointer; text-align:left; transition:all 0.15s;
+}
+.pane button:hover { background:#1B5E20; border-color:#4caf50; color:#F9A825; }
+.pane button.active { background:#1B5E20; border-color:#4caf50; color:#F9A825; font-weight:700; }
+.pane button.active-v2 { background:#bf360c; border-color:#ff7043; color:#fff; font-weight:700; }
+.pane button.active-v3 { background:#0d47a1; border-color:#42a5f5; color:#fff; font-weight:700; }
+
+#specs {
+  position:fixed; right:12px; top:55px; z-index:10; width:158px;
+  background:rgba(10,22,12,0.92); border:1px solid #2e5c30;
+  border-radius:10px; padding:9px;
+  box-shadow:0 2px 16px rgba(0,0,0,0.35); backdrop-filter:blur(10px);
+}
+#specs h3 { font-size:8.5px; font-weight:700; color:#F9A825; margin-bottom:5px; text-transform:uppercase; letter-spacing:1.5px; }
+.sr { display:flex; justify-content:space-between; padding:2.5px 0; font-size:10px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.sr:last-child { border-bottom:none; }
+.sr .k { color:#81c784; } .sr .v { color:#fff; font-weight:600; }
+#mode-badge { margin-top:8px; text-align:center; padding:5px 8px; border-radius:5px; font-size:10.5px; font-weight:700; }
+
+#tooltip {
+  position:fixed; background:rgba(13,26,16,0.97); border:1px solid #4caf50;
+  border-radius:8px; padding:9px 13px; z-index:20; pointer-events:none;
+  display:none; max-width:220px; box-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+#tooltip h4 { font-size:11.5px; font-weight:700; color:#F9A825; margin-bottom:3px; }
+#tooltip p  { font-size:10px; color:#a5d6a7; line-height:1.45; }
+
+#bar {
+  position:fixed; bottom:10px; left:50%; transform:translateX(-50%);
+  background:rgba(10,22,12,0.92); border:1px solid #2e5c30;
+  border-radius:8px; padding:7px 14px; z-index:10;
+  display:flex; gap:14px; align-items:center; box-shadow:0 2px 12px rgba(0,0,0,0.3);
+}
+.kbd { display:flex; align-items:center; gap:4px; font-size:9px; }
+.kbd .k { background:#1B5E20; color:#F9A825; padding:2px 5px; border-radius:3px; font-size:8.5px; font-weight:700; }
+.kbd .l { color:#81c784; }
+
+
+#load {
+  position:fixed; inset:0; background:#0d1a10; z-index:100;
+  display:flex; align-items:center; justify-content:center; flex-direction:column; transition:opacity 0.8s;
+}
+#load.hide { opacity:0; pointer-events:none; }
+#load h2 { color:#F9A825; font-size:26px; font-weight:900; letter-spacing:2px; }
+#load p  { color:#4caf50; font-size:12px; margin-top:5px; }
+#load-bar { width:200px; height:3px; background:#1a2e1c; border-radius:2px; margin-top:14px; overflow:hidden; }
+#load-fill { height:100%; background:#F9A825; width:0%; transition:width 0.3s; border-radius:2px; }
+
+/* ── Mobile (≤ 640 px) ──────────────────────────────────────────────────────── */
+@media(max-width:640px){
+  #panel {
+    width:100%; left:0; right:0; top:auto; bottom:0;
+    max-height:72vh; overflow-y:auto;
+    padding:8px 10px 24px;
+    border-radius:16px 16px 0 0;
+    border-top:2px solid #4caf50;
+    transform:translateY(100%);
+    transition:transform 0.28s ease;
+    z-index:25;
+  }
+  #panel.mob-open { transform:translateY(0); }
+  .pane button { font-size:14px; padding:11px 12px; margin-bottom:5px; }
+  .pane h3 { font-size:10px; padding-top:4px; }
+  #specs { display:none; }
+  #bar  { display:none; }
+  #hud h1 { font-size:13px; }
+  #hud .sub { display:none; }
+  #mob-tog { display:flex !important; }
+  #mob-mode { display:block !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="load"><h2>ICC SPORTS AZ</h2><p>Loading 3D Facility Tour v5...</p><div id="load-bar"><div id="load-fill"></div></div></div>
+
+<div id="hud">
+  <h1>ICC SPORTS AZ — 3D Virtual Tour v5</h1>
+  <div class="sub">9,000 SF &nbsp;|&nbsp; 75 × 120 ft &nbsp;|&nbsp; 20 ft ceiling &nbsp;|&nbsp; Drag=Rotate &nbsp;·&nbsp; Scroll=Zoom &nbsp;·&nbsp; D=Dims &nbsp;·&nbsp; V=Version &nbsp;·&nbsp; N=Nets &nbsp;·&nbsp; 1–7=Views</div>
+</div>
+
+<div id="panel">
+  <div class="pane">
+    <h3>Camera Views</h3>
+    <button onclick="fly('entrance')" class="active" data-v="entrance">1 · Entrance</button>
+    <button onclick="fly('birdseye')" data-v="birdseye">2 · Bird's Eye</button>
+    <button onclick="fly('lanes')" data-v="lanes">3 · Down the Lanes</button>
+    <button onclick="fly('court')" data-v="court">4 · Box Cricket Court</button>
+    <button onclick="fly('lounge')" data-v="lounge">5 · Viewing Lounge</button>
+    <button onclick="fly('reception')" data-v="reception">6 · Reception</button>
+    <button onclick="fly('walkin')" data-v="walkin">7 · Walk-in POV</button>
+  </div>
+  <div class="pane">
+    <h3>Configuration — press V to cycle</h3>
+    <button onclick="setMode(1)" id="mv1" class="active">V1 — 6 Individual Lanes</button>
+    <button onclick="setMode(2)" id="mv2">V2 — 3 Lanes + Box Court</button>
+    <button onclick="setMode(3)" id="mv3">V3 — 2 Full Box Courts</button>
+  </div>
+  <div class="pane">
+    <h3>Overlays</h3>
+    <button onclick="toggleDims()" id="md">D · Toggle Dimensions</button>
+    <button onclick="toggleNets()" id="mn">N · Toggle Net Mesh</button>
+  </div>
+</div>
+
+<div id="specs">
+  <h3>Facility Specs</h3>
+  <div class="sr"><span class="k">Total Area</span><span class="v">9,000 SF</span></div>
+  <div class="sr"><span class="k">Footprint</span><span class="v">75 × 120 ft</span></div>
+  <div class="sr"><span class="k">Ceiling</span><span class="v">20 ft clear</span></div>
+  <div class="sr"><span class="k">Lanes</span><span class="v">6 × 12 ft wide</span></div>
+  <div class="sr"><span class="k">Lane length</span><span class="v">90 ft playing</span></div>
+  <div class="sr"><span class="k">Box court</span><span class="v">36 × 90 ft</span></div>
+  <div class="sr"><span class="k">Support zone</span><span class="v">30 ft deep</span></div>
+  <div class="sr"><span class="k">Viewing lounge</span><span class="v">75 × 18 ft</span></div>
+  <div id="mode-badge" style="background:#1B5E20;color:#F9A825;font-size:10.5px;font-weight:700;text-align:center;margin-top:8px;padding:5px 8px;border-radius:5px;">V1 — 6 Individual Lanes</div>
+</div>
+
+<div id="tooltip"><h4 id="tt"></h4><p id="td"></p></div>
+
+
+<div id="bar">
+  <div class="kbd"><span class="k">Drag</span><span class="l">Rotate</span></div>
+  <div class="kbd"><span class="k">Scroll</span><span class="l">Zoom</span></div>
+  <div class="kbd"><span class="k">D</span><span class="l">Dims</span></div>
+  <div class="kbd"><span class="k">V</span><span class="l">Version</span></div>
+  <div class="kbd"><span class="k">1-7</span><span class="l">Views</span></div>
+  <div class="kbd"><span class="k">N</span><span class="l">Nets</span></div>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── Loading progress ──────────────────────────────────────────────────────────
+const lf = document.getElementById('load-fill');
+let lp = 0;
+const inc = n => { lp=Math.min(100,lp+n); lf.style.width=lp+'%'; };
+
+// ── Facility constants (ALL in feet, 1 unit = 1 ft) ──────────────────────────
+const W  = 75,  // building width (X: -37.5 to +37.5)
+      D  = 120, // building depth (Z: -60 to +60, entrance at +60)
+      H  = 20;  // ceiling height
+const LW = 12, LL = 90, LN = 6; // lane width, length, count
+const FD = 30, VLD = 18;        // front support zone depth, viewing lounge depth (expanded to 18ft)
+// 6 lane centers along X (buffers 1.5ft each side, lanes packed 12ft each)
+const LX  = [-30,-18,-6,6,18,30];
+const LZf = 30,   // front edge of lane zone (= back of support zone)
+      LZb = -60,  // back edge of lane zone
+      LZc = -15;  // center of lane zone ((30+(-60))/2)
+const STf = 18,   // Z position of front (reception-end) stumps: LZf - 12ft run-up
+      STb = -48;  // Z position of back stumps: STf - 66ft pitch
+
+
+
+// ── Scene ─────────────────────────────────────────────────────────────────────
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0a1a0d);
+scene.fog=new THREE.FogExp2(0x0a1a0d,0.005);
+const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,0.1,600);
+camera.position.set(0,18,D/2+35);
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.4;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+window.THREE=THREE;window.__camera=camera;window.__renderer=renderer;
+window.__samplePixel=function(wx,wy,wz,ox=0,oy=0){renderer.render(scene,camera);const v=new THREE.Vector3(wx,wy,wz);v.project(camera);const w=renderer.domElement.width,h=renderer.domElement.height;const px=Math.round((v.x+1)/2*w)+ox;const py=Math.round((-v.y+1)/2*h)+oy;const gl=renderer.getContext();const buf=new Uint8Array(4);gl.readPixels(px,h-py,1,1,gl.RGBA,gl.UNSIGNED_BYTE,buf);return{r:buf[0],g:buf[1],b:buf[2],a:buf[3],px,py};};
+const ctrl=new OrbitControls(camera,renderer.domElement);
+ctrl.enableDamping=true;ctrl.dampingFactor=0.06;
+ctrl.maxPolarAngle=Math.PI/2.02;ctrl.minDistance=3;ctrl.maxDistance=220;
+ctrl.target.set(0,4,0);
+inc(8);
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function B(w,h,d,col,x,y,z,o={}){
+  const m=new THREE.MeshStandardMaterial({color:col,roughness:o.r??0.65,metalness:o.m??0,transparent:!!o.t,opacity:o.t??1,side:o.s??THREE.FrontSide});
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+  mesh.position.set(x,y,z);mesh.castShadow=!o.ns;mesh.receiveShadow=true;
+  if(o.n)mesh.userData={name:o.n,desc:o.d||''};
+  scene.add(mesh);return mesh;
+}
+function Bg(grp,w,h,d,col,x,y,z,o={}){
+  const m=new THREE.MeshStandardMaterial({color:col,roughness:o.r??0.65,metalness:o.m??0,transparent:!!o.t,opacity:o.t??1});
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+  mesh.position.set(x,y,z);mesh.castShadow=!o.ns;mesh.receiveShadow=true;
+  grp.add(mesh);return mesh;
+}
+function Lbl(text,sz,col,x,y,z,ry=0){
+  const c=document.createElement('canvas');const pw=Math.max(128,text.length*26);c.width=pw;c.height=48;
+  const cx=c.getContext('2d');cx.fillStyle=col;cx.font=`bold ${Math.min(30,pw/text.length*1.1)}px Arial`;
+  cx.textAlign='center';cx.textBaseline='middle';cx.fillText(text,pw/2,24);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(sz,sz*48/pw),new THREE.MeshBasicMaterial({map:t,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+  mesh.position.set(x,y,z);if(ry)mesh.rotation.y=ry;scene.add(mesh);return mesh;
+}
+
+// ── Dimension annotations ─────────────────────────────────────────────────────
+const dimG=new THREE.Group();dimG.visible=false;scene.add(dimG);
+function DL(x1,y1,z1,x2,y2,z2,lbl,col=0xFF6D00){
+  const pts=[new THREE.Vector3(x1,y1,z1),new THREE.Vector3(x2,y2,z2)];
+  dimG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:col})));
+  for(const p of pts){const s=new THREE.Mesh(new THREE.SphereGeometry(0.22,6,6),new THREE.MeshBasicMaterial({color:col}));s.position.copy(p);dimG.add(s);}
+  const mx=(x1+x2)/2,my=(y1+y2)/2+1.5,mz=(z1+z2)/2;
+  const c=document.createElement('canvas');c.width=256;c.height=44;
+  const cx=c.getContext('2d');cx.fillStyle='#'+col.toString(16).padStart(6,'0');
+  cx.font='bold 26px Arial';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lbl,128,22);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;
+  const lb=new THREE.Mesh(new THREE.PlaneGeometry(6,1),new THREE.MeshBasicMaterial({map:t,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+  lb.position.set(mx,my,mz);dimG.add(lb);
+}
+DL(-W/2,0.5,D/2+4,W/2,0.5,D/2+4,'75 ft wide',0xF9A825);
+DL(-W/2-4,0.5,D/2,-W/2-4,0.5,-D/2,'120 ft deep',0xF9A825);
+DL(-W/2-4,0.2,-D/2,-W/2-4,H,-D/2,'20 ft ceiling',0xFF6D00);
+DL(LX[0]-LW/2,0.5,LZf+4,LX[0]+LW/2,0.5,LZf+4,'12 ft lane',0x42A5F5);
+DL(LX[0]-LW/2-2,0.5,LZf,LX[0]-LW/2-2,0.5,LZb,'90 ft',0x42A5F5);
+DL(-LW*3,0.5,LZf+7,0,0.5,LZf+7,'36 ft court',0xF9A825);
+DL(W/2+3,0.5,D/2,W/2+3,0.5,LZf,'30 ft support',0x9C27B0);
+DL(W/2+3,0.5,LZf,W/2+3,0.5,LZf-VLD,'18 ft lounge',0x1565C0);
+let dimsVis=false;
+window.toggleDims=()=>{dimsVis=!dimsVis;dimG.visible=dimsVis;document.getElementById('md').classList.toggle('active',dimsVis);};
+
+// ── Raycasting setup ──────────────────────────────────────────────────────────
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),iObj=[],tip=document.getElementById('tooltip');
+let hovObj=null;
+inc(5);
+
+// ── Ground + floor ────────────────────────────────────────────────────────────
+const gnd=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshStandardMaterial({color:0x080e08,roughness:0.95}));gnd.rotation.x=-Math.PI/2;gnd.position.y=-0.06;scene.add(gnd);
+const flr=new THREE.Mesh(new THREE.PlaneGeometry(W+0.4,D+0.4),new THREE.MeshStandardMaterial({color:0x18201a,roughness:0.3,metalness:0.06}));
+flr.rotation.x=-Math.PI/2;flr.position.y=0.01;flr.receiveShadow=true;scene.add(flr);
+inc(4);
+
+// ── Ceiling + trusses ─────────────────────────────────────────────────────────
+const ceil=new THREE.Mesh(new THREE.PlaneGeometry(W,D),new THREE.MeshStandardMaterial({color:0xf2f2f2,roughness:0.8}));
+ceil.rotation.x=Math.PI/2;ceil.position.y=H;scene.add(ceil);
+for(let i=0;i<6;i++) B(W-1,1.1,0.5,0x607d8b,0,H-0.6,-D/2+10+i*20,{r:0.3,m:0.7,ns:true});
+
+// ── Walls ─────────────────────────────────────────────────────────────────────
+const wM=new THREE.MeshStandardMaterial({color:0xf0f0f0,roughness:0.75});
+// Back, left, right walls
+const bkW=new THREE.Mesh(new THREE.PlaneGeometry(W,H),wM.clone());bkW.position.set(0,H/2,-D/2);scene.add(bkW);
+const lw=new THREE.Mesh(new THREE.PlaneGeometry(D,H),wM.clone());lw.position.set(-W/2,H/2,0);lw.rotation.y=Math.PI/2;scene.add(lw);
+const rw=new THREE.Mesh(new THREE.PlaneGeometry(D,H),wM.clone());rw.position.set(W/2,H/2,0);rw.rotation.y=-Math.PI/2;scene.add(rw);
+// Front wall side panels (glass center 30ft wide)
+B(W/2-16,H,0.4,0x1B5E20,-W/4-8,H/2,D/2,{r:0.5});
+B(W/2-16,H,0.4,0x1B5E20, W/4+8,H/2,D/2,{r:0.5});
+B(W-1,H-10,0.4,0xb0d8ff,0,H-5,D/2,{r:0.02,m:0.06,t:0.12,ns:true,s:THREE.DoubleSide});
+// Gold accent pillars at glass entry edge
+B(1.3,H,1.3,0xF9A825,-15,H/2,D/2,{m:0.5,r:0.15});
+B(1.3,H,1.3,0xF9A825, 15,H/2,D/2,{m:0.5,r:0.15});
+// Lower green accent strips
+B(W,2,0.25,0x1B5E20,0,1,D/2-0.3,{ns:true});
+B(D,2,0.25,0x1B5E20,0,1,-W/2+0.3,{ns:true,r:0.3}).rotation.y=Math.PI/2;
+B(D,2,0.25,0x1B5E20,0,1, W/2-0.3,{ns:true,r:0.3}).rotation.y=Math.PI/2;
+// Glass entry
+const gm=new THREE.MeshStandardMaterial({color:0xb3d9ff,transparent:true,opacity:0.15,roughness:0.02,metalness:0.1});
+for(let i=0;i<2;i++){const g=new THREE.Mesh(new THREE.PlaneGeometry(13,H-10),gm);g.position.set(i===0?-7.5:7.5,H-5-(H-10)/2,D/2-0.15);scene.add(g);}
+const gd=new THREE.Mesh(new THREE.PlaneGeometry(28,10),gm);gd.position.set(0,5,D/2-0.1);scene.add(gd);
+// Entrance sign
+const sc=document.createElement('canvas');sc.width=1024;sc.height=256;
+const sx=sc.getContext('2d');sx.fillStyle='#1B5E20';sx.fillRect(0,0,1024,256);
+sx.strokeStyle='#F9A825';sx.lineWidth=5;sx.strokeRect(8,8,1008,240);
+sx.fillStyle='#F9A825';sx.font='bold 72px Arial';sx.textAlign='center';sx.fillText('ICC SPORTS AZ',512,108);
+sx.fillStyle='#fff';sx.font='38px Arial';sx.fillText('Indoor Cricket Club — North Phoenix, AZ',512,168);
+sx.fillStyle='#a5d6a7';sx.font='24px Arial';sx.fillText('Where Phoenix Plays Cricket  ·  9,000 SF  ·  6 Lanes',512,214);
+const st=new THREE.CanvasTexture(sc);st.colorSpace=THREE.SRGBColorSpace;
+const sm=new THREE.Mesh(new THREE.PlaneGeometry(22,5.5),new THREE.MeshBasicMaterial({map:st,side:THREE.DoubleSide}));
+sm.position.set(0,16.2,D/2-0.25);scene.add(sm);
+inc(8);
+
+// ── Support zone back rooms (Z: +48 to +60, 12ft deep) ───────────────────────
+const roomD=D/2-(LZf+VLD);        // = 12ft
+const SZ=LZf+VLD+roomD/2;         // = 54 (center of back room zone)
+const roomDef=[
+  {nm:'Equipment Storage',   dc:'144 SF — cricket gear, maintenance, storage.',          col:0x1B5E20, ax:-31.5, aw:12},
+  {nm:'Reception + Pro Shop',dc:'360 SF — check-in, booking & gear sales. One staff.',  col:0xF9A825, ax:-10.5, aw:30},
+  {nm:'Restrooms',           dc:'180 SF — M/F, ADA compliant.',                         col:0x6a1b9a, ax: 12.0, aw:15},
+  {nm:'Back Storage',        dc:'96 SF — utility & server back-of-house.',               col:0x37474f, ax: 23.5, aw: 8},
+  {nm:'Caretaker Room',      dc:'120 SF — live-in caretaker, single bed & desk.',        col:0x4e342e, ax: 32.5, aw:10},
+];
+for(const rm of roomDef){
+  const fM=new THREE.Mesh(new THREE.PlaneGeometry(rm.aw,roomD-0.5),new THREE.MeshStandardMaterial({color:rm.col,roughness:0.6,transparent:true,opacity:0.35}));
+  fM.rotation.x=-Math.PI/2;fM.position.set(rm.ax,0.03,SZ);fM.userData={name:rm.nm,desc:rm.dc};iObj.push(fM);scene.add(fM);
+  Lbl(rm.nm.split('+')[0].trim().split(' ')[0].toUpperCase(),7,rm.nm.includes('Reception')?'#F9A825':'#ffffff',rm.ax,8.5,D/2-1.5);
+}
+// Room glass partitions (3 dividers between 4 rooms)
+for(const px of [-25.5,4.5,19.5,27.5]) B(0.25,H,roomD,0xb0d8ff,px,H/2,SZ,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+// Reception + Pro Shop desk (long counter, one staff manages both)
+B(24,1.1,2,0x1B5E20,-10.5,1.0,LZf+VLD+2.2,{r:0.3,n:'Reception & Pro Shop',d:'Check-in, POS, bookings + cricket gear. One staff manages both.'});
+B(24,0.12,2,0xF9A825,-10.5,1.67,LZf+VLD+2.2,{m:0.5,r:0.15,ns:true});
+B(2.4,1.6,0.15,0x263238,-20,4,LZf+VLD+3,{r:0.15,ns:true});
+B(2.1,1.2,0.05,0x42a5f5,-20,4,LZf+VLD+3.15,{r:0.05,ns:true,t:0.85});
+// Pro shop gear racks behind counter
+for(let i=0;i<3;i++){B(0.2,5.5,2.5,0x1a1a2e,-19+i*4.5,2.75,LZf+VLD+8.5,{r:0.3});for(let j=0;j<4;j++)B(4,0.08,2.2,0xdddddd,-19+i*4.5,0.8+j*1.3,LZf+VLD+8.5,{ns:true});}
+// Bat wall display
+for(let i=0;i<5;i++) B(0.22,5.5,0.1,0x8d6e63,-5+i*1.8,2.75,LZf+VLD+9.5,{r:0.4});
+// Caretaker room furnishings (X: 27.5–37.5, Z: 48–60)
+B(6,0.6,3.2,0x546e7a,32.5,0.6,56.5,{r:0.5,n:'Caretaker Room',d:'Live-in caretaker — single bed & desk. 120 SF.'});
+B(5.8,0.1,3,0xeceff1,32.5,0.93,56.5,{ns:true});        // mattress
+B(2,0.22,1,0xffffff,31,1.08,54.9,{ns:true});             // pillow
+B(4,0.85,1.8,0x6d4c41,35,0.85,50.2,{r:0.4,n:'Caretaker Desk',d:'Work desk in caretaker room.'});
+B(3.8,0.06,1.6,0x9e9e9e,35,1.89,50.2,{ns:true,m:0.5}); // desk surface
+inc(8);
+
+// ── Expanded Viewing Lounge (Z: +30 to +48, 18ft deep desi hangout) ──────────
+const gw=new THREE.Mesh(new THREE.PlaneGeometry(W,H),new THREE.MeshStandardMaterial({color:0xb0d8ff,transparent:true,opacity:0.1,roughness:0.02,metalness:0.05,side:THREE.DoubleSide}));
+gw.position.set(0,H/2,LZf);scene.add(gw);
+for(const fy of [0,H/3,2*H/3,H]) B(W,0.1,0.08,0x78909c,0,fy,LZf,{ns:true,m:0.8,r:0.2});
+// Lane-front bench — cricket side of glass, run-up start, players sit facing the nets
+for(let i=0;i<LN;i++){const lx=LX[i];
+  B(10,0.45,1.5,0x1B5E20,lx,0.45,LZf-1.1,{r:0.65,n:'Lane Bench',d:'Run-up start bench — sit facing nets, store bags under seat.'});
+  B(9.8,0.1,1.4,0xF9A825,lx,0.68,LZf-1.1,{ns:true});     // gold cushion
+  B(10,1.2,0.2,0x1B5E20,lx,1.15,LZf-0.25,{r:0.6});        // backrest flush against glass (cricket side)
+  B(0.15,0.9,1.5,0x263238,lx-5.1,0.55,LZf-1.1,{r:0.3});  // left leg
+  B(0.15,0.9,1.5,0x263238,lx+5.1,0.55,LZf-1.1,{r:0.3});  // right leg
+}
+// Gang hangout zone — left corner L-booth
+B(1.5,0.45,10,0x37474f,-W/2+1.3,0.45,LZf+9,{r:0.5,n:'Corner Booth',d:'Gang hangout corner booth — left side.'});
+B(1.3,0.1,9.8,0xc62828,-W/2+1.3,0.68,LZf+9,{ns:true});
+B(0.15,1.1,10,0x212121,-W/2+0.45,1.05,LZf+9,{r:0.4});
+B(8,0.45,1.5,0x37474f,-W/2+5.5,0.45,LZf+14,{r:0.5});
+B(7.8,0.1,1.3,0xc62828,-W/2+5.5,0.68,LZf+14,{ns:true});
+B(8,1.1,0.15,0x212121,-W/2+5.5,1.05,LZf+14.75,{r:0.4});
+B(5,0.07,3.5,0x424242,-W/2+4.5,1.15,LZf+11,{r:0.2,m:0.5});
+// Gang hangout zone — right corner L-booth (mirror)
+B(1.5,0.45,10,0x37474f,W/2-1.3,0.45,LZf+9,{r:0.5,n:'Corner Booth',d:'Gang hangout corner booth — right side.'});
+B(1.3,0.1,9.8,0xc62828,W/2-1.3,0.68,LZf+9,{ns:true});
+B(0.15,1.1,10,0x212121,W/2-0.45,1.05,LZf+9,{r:0.4});
+B(8,0.45,1.5,0x37474f,W/2-5.5,0.45,LZf+14,{r:0.5});
+B(7.8,0.1,1.3,0xc62828,W/2-5.5,0.68,LZf+14,{ns:true});
+B(8,1.1,0.15,0x212121,W/2-5.5,1.05,LZf+14.75,{r:0.4});
+B(5,0.07,3.5,0x424242,W/2-4.5,1.15,LZf+11,{r:0.2,m:0.5});
+// 3 round group tables with 4 chairs each — center hangout
+for(let i=0;i<3;i++){const cx=-20+i*20;
+  const tg=new THREE.CylinderGeometry(1.3,1.3,0.08,16);
+  const tm=new THREE.Mesh(tg,new THREE.MeshStandardMaterial({color:0x424242,roughness:0.2,metalness:0.5}));
+  tm.position.set(cx,1.12,LZf+12);scene.add(tm);
+  const lg=new THREE.CylinderGeometry(0.09,0.09,1.02,8);
+  const lm=new THREE.Mesh(lg,new THREE.MeshStandardMaterial({color:0x616161,roughness:0.3,metalness:0.6}));
+  lm.position.set(cx,0.56,LZf+12);scene.add(lm);
+  for(const[dx,dz]of[[-2.5,0],[2.5,0],[0,-2.5],[0,2.5]]){B(1.4,0.4,1.4,0x37474f,cx+dx,0.4,LZf+12+dz,{r:0.5});}
+}
+// Vending machines — left and right ends
+B(2.2,6,1.8,0x1a237e,-W/2+2.2,3,LZf+16.2,{r:0.2,m:0.3,n:'Vending Machine',d:'Snacks & drinks for members.'});
+B(2.2,0.1,1.8,0xF9A825,-W/2+2.2,6.08,LZf+16.2,{ns:true});
+B(1.8,3.5,0.07,0x1565c0,-W/2+2.2,3.5,LZf+15.3,{r:0.08,t:0.88,ns:true});
+B(2.2,6,1.8,0x1a237e,W/2-2.2,3,LZf+16.2,{r:0.2,m:0.3,n:'Vending Machine',d:'Energy & sports drinks for members.'});
+B(2.2,0.1,1.8,0xF9A825,W/2-2.2,6.08,LZf+16.2,{ns:true});
+B(1.8,3.5,0.07,0x1565c0,W/2-2.2,3.5,LZf+15.3,{r:0.08,t:0.88,ns:true});
+// 65" TVs on left and right walls (cricket / IPL)
+{const tvM=new THREE.MeshBasicMaterial({color:0x111111});const scM=new THREE.MeshBasicMaterial({color:0x0d1b3e});
+const tL=new THREE.Mesh(new THREE.BoxGeometry(0.2,4.2,7.2),tvM);tL.position.set(-W/2+0.1,9.2,LZf+9);scene.add(tL);
+const sL=new THREE.Mesh(new THREE.PlaneGeometry(6.8,3.8),scM);sL.position.set(-W/2+0.22,9.2,LZf+9);sL.rotation.y=Math.PI/2;scene.add(sL);
+const tR=new THREE.Mesh(new THREE.BoxGeometry(0.2,4.2,7.2),tvM);tR.position.set(W/2-0.1,9.2,LZf+9);scene.add(tR);
+const sR=new THREE.Mesh(new THREE.PlaneGeometry(6.8,3.8),scM);sR.position.set(W/2-0.22,9.2,LZf+9);sR.rotation.y=-Math.PI/2;scene.add(sR);}
+// Lounge floor tint
+const vlF=new THREE.Mesh(new THREE.PlaneGeometry(W,VLD),new THREE.MeshStandardMaterial({color:0x1a237e,transparent:true,opacity:0.18}));
+vlF.rotation.x=-Math.PI/2;vlF.position.set(0,0.02,LZf+VLD/2);scene.add(vlF);
+Lbl('VIEWING LOUNGE  —  75 x 18 ft  |  Corner Booths  |  2x65" TVs  |  Vending',11,'#90caf9',0,13,LZf+VLD/2);
+// Separator glass wall between lounge and back rooms
+B(W,H,0.25,0xb0d8ff,0,H/2,LZf+VLD+0.15,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+inc(6);
+
+// ── Cricket lanes ─────────────────────────────────────────────────────────────
+const turfMeshes=[];
+const rightStumps=new THREE.Group();scene.add(rightStumps);
+const leftStumps=new THREE.Group();scene.add(leftStumps);
+for(let i=0;i<LN;i++){
+  const lx=LX[i],isR=(i>=3);
+  const turf=new THREE.Mesh(new THREE.PlaneGeometry(LW-0.2,LL),new THREE.MeshStandardMaterial({color:isR?0x558B2F:0x2E7D32,roughness:0.55}));
+  turf.rotation.x=-Math.PI/2;turf.position.set(lx,0.03,LZc);turf.receiveShadow=true;
+  turf.userData={name:`Lane ${i+1}`,desc:`12 × 90 ft. ${isR?'Converts to box cricket court.':'Individual practice lane.'}`};
+  iObj.push(turf);turfMeshes.push(turf);scene.add(turf);
+  // Pitch strip
+  const ps=new THREE.Mesh(new THREE.PlaneGeometry(2,LL),new THREE.MeshStandardMaterial({color:0x8d6e63,roughness:0.45,transparent:true,opacity:0.4}));
+  ps.rotation.x=-Math.PI/2;ps.position.set(lx,0.04,LZc);scene.add(ps);
+  // Crease lines
+  for(const cz of [STf+4,STb-4]){const cm=new THREE.Mesh(new THREE.PlaneGeometry(LW-0.5,0.1),new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.4}));cm.rotation.x=-Math.PI/2;cm.position.set(lx,0.05,cz);scene.add(cm);}
+  // Half-way crease
+  const hm=new THREE.Mesh(new THREE.PlaneGeometry(LW-0.5,0.1),new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.4,transparent:true,opacity:0.5}));
+  hm.rotation.x=-Math.PI/2;hm.position.set(lx,0.05,LZc);scene.add(hm);
+  // Stumps at both ends — grouped so V2/V3 can hide them
+  const stGrp=(i<3)?leftStumps:rightStumps;
+  for(const sz of [STf,STb]) for(let s=-1;s<=1;s++){
+    const sg=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,2.4,6),new THREE.MeshStandardMaterial({color:0xD4A437,roughness:0.35}));
+    sg.position.set(lx-0.35+s*0.35,1.2,sz);sg.castShadow=true;stGrp.add(sg);
+  }
+  // Bail bar
+  for(const sz of [STf,STb]) Bg(stGrp,0.6,0.07,0.07,0xD4A437,lx,2.43,sz,{ns:true});
+  // Bowling machine (L1 and L4)
+  if(i===0||i===3){
+    B(1.4,2,1.4,0x424242,lx,1,STf+4,{r:0.25,m:0.6,n:'Bowling Machine',d:'Variable speed 40–90 mph. 2 machines total.'});
+    const wh=new THREE.Mesh(new THREE.TorusGeometry(0.38,0.1,8,16),new THREE.MeshStandardMaterial({color:0xF9A825,roughness:0.3,metalness:0.6}));
+    wh.position.set(lx,2.5,STf+4);wh.rotation.x=Math.PI/2;scene.add(wh);
+  }
+  Lbl(`L${i+1}`,4.5,isR?'#F9A825':'#81c784',lx,14.5,LZf-2);
+}
+// Run-up overlay
+const ruF=new THREE.Mesh(new THREE.PlaneGeometry(W-2,12),new THREE.MeshStandardMaterial({color:0x4caf50,transparent:true,opacity:0.18}));
+ruF.rotation.x=-Math.PI/2;ruF.position.set(0,0.04,LZf-6);scene.add(ruF);
+Lbl('BOWLER RUN-UP  12 ft',8,'#a5d6a7',0,0.7,LZf-6);
+// Egress overlay
+const egF=new THREE.Mesh(new THREE.PlaneGeometry(W-2,12),new THREE.MeshStandardMaterial({color:0xff6d00,transparent:true,opacity:0.13}));
+egF.rotation.x=-Math.PI/2;egF.position.set(0,0.04,LZb+6);scene.add(egF);
+Lbl('EGRESS  12 ft',7,'#ff8f00',0,0.7,LZb+6);
+inc(8);
+
+// ── Net dividers ───────────────────────────────────────────────────────────────
+const netGroups={};
+const divXPositions=[-24,-12,0,12,24]; // internal dividers (0 = center, permanent)
+for(const dx of [-36,...divXPositions,36]){
+  const grp=new THREE.Group();scene.add(grp);
+  if(divXPositions.includes(dx))netGroups[dx]=grp;
+  const isCenter=(dx===0),isOuter=(Math.abs(dx)===36);
+  const pCol=isCenter?0xF9A825:(isOuter?0x455a64:0x546e7a);
+  const nCol=isCenter?0xF9A825:0x90a4ae;
+  // Poles
+  for(let pz=LZb;pz<=LZf;pz+=22.5){
+    const pol=new THREE.Mesh(new THREE.CylinderGeometry(isCenter?0.11:0.07,isCenter?0.11:0.07,H,8),new THREE.MeshStandardMaterial({color:pCol,roughness:0.2,metalness:0.75}));
+    pol.position.set(dx,H/2,pz);pol.castShadow=true;grp.add(pol);
+  }
+  // Top rail
+  const rail=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,LL+1,6),new THREE.MeshStandardMaterial({color:pCol,roughness:0.2,metalness:0.75}));
+  rail.position.set(dx,H-0.5,LZc);rail.rotation.x=Math.PI/2;grp.add(rail);
+  // Net mesh
+  const nm=new THREE.Mesh(new THREE.PlaneGeometry(LL,H-0.8,22,10),new THREE.MeshStandardMaterial({color:nCol,transparent:true,opacity:0.08,side:THREE.DoubleSide,wireframe:true}));
+  nm.position.set(dx,H/2,LZc);nm.rotation.y=Math.PI/2;grp.add(nm);
+}
+// End nets
+for(const ez of [LZf,LZb]){
+  const en=new THREE.Mesh(new THREE.PlaneGeometry(72,H-0.8,15,10),new THREE.MeshStandardMaterial({color:0x90a4ae,transparent:true,opacity:0.06,side:THREE.DoubleSide,wireframe:true}));
+  en.position.set(0,H/2,ez);scene.add(en);
+}
+inc(8);
+
+// ── Box cricket court overlays (V2/V3) ───────────────────────────────────────
+const hw=LW*1.5; // court half-width = 18ft
+function makeBoxCourt(cx,lineCol){
+  const g=new THREE.Group();scene.add(g);g.visible=false;
+  const LK=0.28; // line thickness
+  // Perimeter boundary lines
+  for(const bz of[-1,1]){const e=new THREE.Mesh(new THREE.PlaneGeometry(hw*2+LK,LK),new THREE.MeshBasicMaterial({color:lineCol}));e.rotation.x=-Math.PI/2;e.position.set(cx,0.08,LZc+bz*LL/2);g.add(e);}
+  for(const bx of[-1,1]){const s=new THREE.Mesh(new THREE.PlaneGeometry(LK,LL),new THREE.MeshBasicMaterial({color:lineCol}));s.rotation.x=-Math.PI/2;s.position.set(cx+bx*hw,0.08,LZc);g.add(s);}
+  // Half-way line
+  const hl=new THREE.Mesh(new THREE.PlaneGeometry(hw*2,LK*0.6),new THREE.MeshBasicMaterial({color:lineCol,transparent:true,opacity:0.7}));hl.rotation.x=-Math.PI/2;hl.position.set(cx,0.08,LZc);g.add(hl);
+  // Crease lines at both bowling ends (12ft inside from each end)
+  for(const cz of[STf,STb]){const cr=new THREE.Mesh(new THREE.PlaneGeometry(hw*2-0.5,LK*0.6),new THREE.MeshBasicMaterial({color:0xffffff}));cr.rotation.x=-Math.PI/2;cr.position.set(cx,0.09,cz);g.add(cr);}
+  // Return crease side stubs at both ends
+  for(const cz of[STf,STb]) for(const bx of[-1,1]){const rc=new THREE.Mesh(new THREE.PlaneGeometry(LK*0.5,4),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.8}));rc.rotation.x=-Math.PI/2;rc.position.set(cx+bx*(hw-3),0.09,cz+(cz>0?-2:2));g.add(rc);}
+  // Penalty zone highlights at both ends (last 8ft = danger zone)
+  for(const sign of[-1,1]){const pz=new THREE.Mesh(new THREE.PlaneGeometry(hw*2-0.4,8),new THREE.MeshStandardMaterial({color:0xff2200,transparent:true,opacity:0.09,roughness:0.9}));pz.rotation.x=-Math.PI/2;pz.position.set(cx,0.065,LZc+sign*(LL/2-4));g.add(pz);}
+  // Center circle
+  const cg=new THREE.RingGeometry(4.5,4.9,36);const circle=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:lineCol,transparent:true,opacity:0.45,side:THREE.DoubleSide}));circle.rotation.x=-Math.PI/2;circle.position.set(cx,0.08,LZc);g.add(circle);
+  // Center dot
+  const cd=new THREE.Mesh(new THREE.CircleGeometry(0.6,16),new THREE.MeshBasicMaterial({color:lineCol,transparent:true,opacity:0.55}));cd.rotation.x=-Math.PI/2;cd.position.set(cx,0.081,LZc);g.add(cd);
+  // Pitch strip (center 10ft wide × 66ft long between creases)
+  const ps=new THREE.Mesh(new THREE.PlaneGeometry(10,LL*0.73),new THREE.MeshStandardMaterial({color:0x8d6e63,roughness:0.5,transparent:true,opacity:0.35}));ps.rotation.x=-Math.PI/2;ps.position.set(cx,0.082,LZc);g.add(ps);
+  // Box cricket — single center wicket per end (1 stump, box cricket rules)
+  for(const sz of[STf,STb]){
+    const st=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,2.6,8),new THREE.MeshStandardMaterial({color:0xffe082,roughness:0.3}));
+    st.position.set(cx,1.3,sz);st.castShadow=true;g.add(st);
+  }
+  return g;
+}
+// Turf overlays (color tint)
+const rcO=new THREE.Mesh(new THREE.PlaneGeometry(LW*3,LL),new THREE.MeshStandardMaterial({color:0xF57F17,transparent:true,opacity:0,roughness:0.5}));
+rcO.rotation.x=-Math.PI/2;rcO.position.set(18,0.055,LZc);scene.add(rcO);
+const rcL=makeBoxCourt(18,0xFFD54F);
+const rcLbl=Lbl('BOX COURT — 36×90 ft',13,'#FFD54F',18,10.5,LZc);rcLbl.visible=false;
+
+const lcO=new THREE.Mesh(new THREE.PlaneGeometry(LW*3,LL),new THREE.MeshStandardMaterial({color:0x0277BD,transparent:true,opacity:0,roughness:0.5}));
+lcO.rotation.x=-Math.PI/2;lcO.position.set(-18,0.055,LZc);scene.add(lcO);
+const lcL=makeBoxCourt(-18,0x64B5F6);
+const lcLbl=Lbl('BOX COURT — 36×90 ft',13,'#64B5F6',-18,10.5,LZc);lcLbl.visible=false;
+window.__rcL=rcL;window.__lcL=lcL;window.__rightStumps=rightStumps;window.__leftStumps=leftStumps;
+inc(5);
+
+// ── Exit signs + fire extinguishers ─────────────────────────────────────────
+function ExSign(x,y,z,ry){
+  const c=document.createElement('canvas');c.width=120;c.height=44;const cx=c.getContext('2d');
+  cx.fillStyle='#D32F2F';cx.fillRect(0,0,120,44);cx.fillStyle='#fff';cx.font='bold 26px Arial';cx.textAlign='center';cx.fillText('EXIT',60,32);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(2.4,0.9),new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide}));
+  m.position.set(x,y,z);if(ry)m.rotation.y=ry;scene.add(m);
+}
+ExSign(-W/2+0.7,H-1.5,0,Math.PI/2);ExSign(W/2-0.7,H-1.5,0,-Math.PI/2);ExSign(0,H-1.5,-D/2+0.7,0);
+for(const [fx,fz] of [[-W/2+1,D/4],[-W/2+1,-D/4],[W/2-1,D/4],[W/2-1,-D/4],[0,-D/2+1]])
+  B(0.45,1.35,0.22,0xD32F2F,fx,2,fz,{r:0.3,ns:true});
+
+inc(5);
+
+// ── Lighting ─────────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff,0.4));
+scene.add(new THREE.HemisphereLight(0xffffff,0x1a2e1c,0.35));
+const sun=new THREE.DirectionalLight(0xfff5e6,0.85);
+sun.position.set(30,60,50);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-90;sun.shadow.camera.right=90;
+sun.shadow.camera.top=75;sun.shadow.camera.bottom=-75;
+sun.shadow.bias=-0.001;scene.add(sun);
+// LED ceiling panels
+for(let i=0;i<4;i++) for(let j=0;j<3;j++){
+  const led=new THREE.PointLight(0xfff8e7,0.38,55,1.5);
+  led.position.set(-W/2+8+i*(W-14)/3,H-1,D/2-8-j*(D-14)/2);scene.add(led);
+  B(4,0.09,1.3,0xfafafa,-W/2+8+i*(W-14)/3,H-0.18,D/2-8-j*(D-14)/2,{ns:true,r:0.08});
+}
+// Lane spotlights
+for(let i=0;i<LN;i++){
+  const sp=new THREE.SpotLight(i>=3?0xFFF9C4:0xB9F6CA,0.22,55,Math.PI/7,0.4);
+  sp.position.set(LX[i],H-0.5,LZc+12);sp.target.position.set(LX[i],0,LZc-20);
+  scene.add(sp);scene.add(sp.target);
+}
+inc(5);
+
+// ── Mode switching V1/V2/V3 ───────────────────────────────────────────────────
+let currentMode=1;
+const modeBadge=document.getElementById('mode-badge');
+window.setMode=function(m){
+  currentMode=m;
+  // Internal net visibility
+  const rInner=[12,24],lInner=[-24,-12];
+  for(const[dx,grp] of Object.entries(netGroups)){
+    const x=parseInt(dx);
+    if(x===0){grp.visible=true;continue;}
+    if(rInner.includes(x))grp.visible=(m===1);
+    if(lInner.includes(x))grp.visible=(m<=2);
+  }
+  // Court overlays
+  rcO.material.opacity=(m>=2)?0.12:0;rcL.visible=(m>=2);rcLbl.visible=(m>=2);
+  lcO.material.opacity=(m===3)?0.1:0;lcL.visible=(m===3);lcLbl.visible=(m===3);
+  // Turf colors
+  for(let i=0;i<LN;i++){
+    const isR=(i>=3),isL=(i<3);
+    turfMeshes[i].material.color.setHex(m>=2&&isR?0x4a3728:(m===3&&isL?0x1a3050:isR?0x558B2F:0x2E7D32));
+  }
+  // Stump visibility — hide regular 3-stump sets when box court replaces them
+  rightStumps.visible=(m===1);leftStumps.visible=(m!==3);
+  document.body.dataset.rightStumpsVis=String(m===1);
+  document.body.dataset.leftStumpsVis=String(m!==3);
+  // Buttons
+  document.getElementById('mv1').className='btn'+(m===1?' active':'');
+  document.getElementById('mv2').className='btn'+(m===2?' active-v2':'');
+  document.getElementById('mv3').className='btn'+(m===3?' active-v3':'');
+  const mLabels={1:'V1 — 6 Individual Lanes',2:'V2 — 3 Lanes + Box Court',3:'V3 — 2 Full Box Courts'};
+  const mBg={1:'#1B5E20',2:'#bf360c',3:'#0d47a1'};
+  modeBadge.textContent=mLabels[m];modeBadge.style.background=mBg[m];modeBadge.style.color='#fff';
+  const mobMode=document.getElementById('mob-mode');
+  if(mobMode){mobMode.textContent='V'+m;mobMode.style.background=mBg[m];}
+  if(m===2)fly('court');else if(m===3)fly('birdseye');
+};
+
+// ── Net mesh toggle ───────────────────────────────────────────────────────────
+let netsVis=true;
+window.toggleNets=()=>{
+  netsVis=!netsVis;
+  for(const grp of Object.values(netGroups))
+    grp.traverse(c=>{if(c.material&&c.material.wireframe!==undefined)c.material.opacity=netsVis?0.08:0;});
+  document.getElementById('mn').classList.toggle('active',!netsVis);
+};
+
+// ── Camera views ──────────────────────────────────────────────────────────────
+const VIEWS={
+  entrance:{p:[0,14,D/2+32],t:[0,4,0]},
+  birdseye:{p:[0,88,10],t:[0,0,-15]},
+  lanes:{p:[-W/2-4,7,LZc+15],t:[0,3,LZc-15]},
+  court:{p:[30,16,LZc+22],t:[18,3,LZc]},
+  lounge:{p:[W/2-8,6,LZf+3],t:[0,4,LZf-6]},
+  reception:{p:[-W/2+12,5,D/2-3],t:[-16,3,D/2-10]},
+  walkin:{p:[0,6,D/2-2],t:[0,4,D/2-20]},
+};
+function fly3D(posA,tarA){
+  const sp=camera.position.clone(),st=ctrl.target.clone();
+  const ep=new THREE.Vector3(...posA),et=new THREE.Vector3(...tarA),t0=performance.now();
+  (function a(now){const t=Math.min((now-t0)/1300,1);const e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    camera.position.lerpVectors(sp,ep,e);ctrl.target.lerpVectors(st,et,e);ctrl.update();if(t<1)requestAnimationFrame(a);})(performance.now());
+}
+window.fly=function(n){
+  const v=VIEWS[n];if(!v)return;
+  document.querySelectorAll('#panel button[data-v]').forEach(b=>b.classList.toggle('active',b.dataset.v===n));
+  fly3D(v.p,v.t);
+};
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+const KM={'1':'entrance','2':'birdseye','3':'lanes','4':'court','5':'lounge','6':'reception','7':'walkin'};
+let vKI=1;
+document.addEventListener('keydown',e=>{
+  if(KM[e.key])fly(KM[e.key]);
+  if(e.key==='d'||e.key==='D')toggleDims();
+  if(e.key==='v'||e.key==='V'){vKI=vKI%3+1;setMode(vKI);}
+  if(e.key==='n'||e.key==='N')toggleNets();
+});
+
+// ── Raycasting: hover + click ─────────────────────────────────────────────────
+renderer.domElement.addEventListener('mousemove',e=>{
+  mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const h=ray.intersectObjects(iObj);
+  if(h.length>0&&h[0].object.userData.name){
+    const o=h[0].object;
+    if(hovObj!==o){hovObj=o;document.getElementById('tt').textContent=o.userData.name;document.getElementById('td').textContent=o.userData.desc;tip.style.display='block';renderer.domElement.style.cursor='pointer';}
+    tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY-8)+'px';
+  } else if(hovObj){hovObj=null;tip.style.display='none';renderer.domElement.style.cursor='grab';}
+});
+renderer.domElement.addEventListener('click',e=>{
+  mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const h=ray.intersectObjects(iObj);
+});
+
+// ── Animation loop ────────────────────────────────────────────────────────────
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+  ctrl.update();renderer.render(scene,camera);
+}
+
+// ── Resize ────────────────────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+inc(20);
+setTimeout(()=>{document.getElementById('load').classList.add('hide');animate();fly('entrance');},500);
+</script>
+
+<!-- Mobile: floating ☰ toggle + current-mode badge -->
+<button id="mob-tog"
+  style="display:none;position:fixed;bottom:18px;right:18px;z-index:30;
+         background:#1B5E20;border:2px solid #4caf50;color:#F9A825;
+         width:54px;height:54px;border-radius:50%;font-size:26px;cursor:pointer;
+         align-items:center;justify-content:center;
+         box-shadow:0 3px 18px rgba(0,0,0,0.65);touch-action:manipulation;"
+  onclick="(function(){var p=document.getElementById('panel');p.classList.toggle('mob-open');document.getElementById('mob-tog').textContent=p.classList.contains('mob-open')?'✕':'☰';})()">☰</button>
+
+<div id="mob-mode"
+  style="display:none;position:fixed;top:46px;right:10px;z-index:15;
+         background:#1B5E20;border:1px solid #4caf50;color:#F9A825;
+         padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;
+         pointer-events:none;">V1</div>
+</body>
+</html>
