@@ -222,8 +222,13 @@ window.THREE=THREE;window.__camera=camera;window.__renderer=renderer;
 window.__C={W,D,H,LW,LL,LN,FD,VLD,LX:[...LX],LZf,LZb,LZc,STf,STb};
 window.__samplePixel=function(wx,wy,wz,ox=0,oy=0){renderer.render(scene,camera);const v=new THREE.Vector3(wx,wy,wz);v.project(camera);const w=renderer.domElement.width,h=renderer.domElement.height;const px=Math.round((v.x+1)/2*w)+ox;const py=Math.round((-v.y+1)/2*h)+oy;const gl=renderer.getContext();const buf=new Uint8Array(4);gl.readPixels(px,h-py,1,1,gl.RGBA,gl.UNSIGNED_BYTE,buf);return{r:buf[0],g:buf[1],b:buf[2],a:buf[3],px,py};};
 const ctrl=new OrbitControls(camera,renderer.domElement);
-ctrl.enableDamping=true;ctrl.dampingFactor=0.06;
+ctrl.enableDamping=true;ctrl.dampingFactor=0.12;      // smoother deceleration (was 0.06)
 ctrl.maxPolarAngle=Math.PI/2.02;ctrl.minDistance=3;ctrl.maxDistance=220;
+ctrl.rotateSpeed=0.6;          // slower, more controlled rotation (default 1.0)
+ctrl.zoomSpeed=0.8;            // slightly slower zoom for precision (default 1.0)
+ctrl.panSpeed=0.7;             // smoother pan (default 1.0)
+ctrl.enableZoom=true;
+ctrl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN}; // standard touch mapping
 ctrl.target.set(0,4,0);
 inc(8);
 
@@ -483,50 +488,47 @@ B(0.7,0.02,0.55,0x42a5f5,-12,2.22,rcZ+0.5,{ns:true,r:0.05});
 B(3,2,0.15,0x111111,-14,6,LZf+VLD+0.5,{r:0.1,m:0.3,n:'Scoreboard Display',d:'Digital signage — live scores, booking status.'});
 B(2.7,1.7,0.05,0x0d47a1,-14,6,LZf+VLD+0.65,{ns:true,r:0.05,t:0.9});
 
-// ── FOUNDERS WALL — behind reception, facing the entrance ──────────────────
-// Premium display wall with ICC branding and 150 founding member signatures
-// Dark green backing panel mounted on the lounge-side wall
-B(26,10,0.3,0x0A1F0C,-10.5,6,LZf+VLD+0.3,{r:0.4,n:'Founders Wall',d:'150 Founding Members. Each signature represents a believer in ICC.'});
-// Gold border frame
-B(26.5,0.2,0.4,0xF9A825,-10.5,11.1,LZf+VLD+0.2,{m:0.6,r:0.1,ns:true}); // top
-B(26.5,0.2,0.4,0xF9A825,-10.5,0.9,LZf+VLD+0.2,{m:0.6,r:0.1,ns:true}); // bottom
-B(0.2,10.2,0.4,0xF9A825,-23.7,6,LZf+VLD+0.2,{m:0.6,r:0.1,ns:true}); // left
-B(0.2,10.2,0.4,0xF9A825,2.7,6,LZf+VLD+0.2,{m:0.6,r:0.1,ns:true});   // right
-// Founders Wall canvas (premium design)
-const fwC=document.createElement('canvas');fwC.width=1024;fwC.height=512;
+// ── FOUNDERS WALL — centered on lounge back wall, elegant & transparent ──────
+// Glass-backed panel with subtle signatures, centered on the separator wall
+const fwCx=0; // centered on building
+B(40,11,0.15,0xb0d8ff,fwCx,6.5,LZf+VLD+0.2,{r:0.02,m:0.06,t:0.08,ns:true,s:THREE.DoubleSide,n:'Founders Wall',d:'150 Founding Members. Each signature represents a believer in ICC.'});
+// Thin gold frame (elegant, not chunky)
+B(40.2,0.1,0.2,0xF9A825,fwCx,12,LZf+VLD+0.15,{m:0.7,r:0.1,ns:true});  // top
+B(40.2,0.1,0.2,0xF9A825,fwCx,1,LZf+VLD+0.15,{m:0.7,r:0.1,ns:true});   // bottom
+B(0.1,11,0.2,0xF9A825,-20,6.5,LZf+VLD+0.15,{m:0.7,r:0.1,ns:true});    // left
+B(0.1,11,0.2,0xF9A825,20,6.5,LZf+VLD+0.15,{m:0.7,r:0.1,ns:true});     // right
+// Founders Wall canvas (transparent bg, cursive signatures, classy)
+const fwC=document.createElement('canvas');fwC.width=2048;fwC.height=1024;
 const fwX=fwC.getContext('2d');
-fwX.fillStyle='#0A1F0C';fwX.fillRect(0,0,1024,512);
-// Gold border
-fwX.strokeStyle='#F9A825';fwX.lineWidth=3;fwX.strokeRect(4,4,1016,504);
-fwX.strokeRect(10,10,1004,492);
-// ICC Logo mark (green box)
-fwX.fillStyle='#1B5E20';fwX.fillRect(440,20,144,50);
-fwX.fillStyle='#F9A825';fwX.font='bold 32px Arial';fwX.textAlign='center';fwX.fillText('ICC',512,55);
-// Title
-fwX.fillStyle='#F9A825';fwX.font='bold 28px Arial';fwX.fillText('FOUNDERS WALL',512,105);
-fwX.fillStyle='#81c784';fwX.font='16px Arial';fwX.fillText('150 Founding Members — The Believers Who Built This',512,130);
-// Horizontal gold line
-fwX.strokeStyle='#F9A825';fwX.lineWidth=1;fwX.beginPath();fwX.moveTo(100,142);fwX.lineTo(924,142);fwX.stroke();
-// Generate 150 signature-style names in a grid (10 cols × 15 rows)
-fwX.fillStyle='#a5d6a7';fwX.font='italic 10px Georgia';
+// Transparent background (clear canvas)
+fwX.clearRect(0,0,2048,1024);
+// Subtle gold header — small, centered, not dominant
+fwX.fillStyle='#F9A825';fwX.globalAlpha=0.7;fwX.font='bold 24px Georgia';fwX.textAlign='center';
+fwX.fillText('FOUNDERS  WALL',1024,40);
+fwX.globalAlpha=0.4;fwX.font='italic 14px Georgia';
+fwX.fillText('150 Founding Members  ·  Est. 2026  ·  Phoenix, Arizona',1024,62);
+// Thin gold separator line
+fwX.strokeStyle='#F9A825';fwX.globalAlpha=0.3;fwX.lineWidth=0.5;
+fwX.beginPath();fwX.moveTo(400,72);fwX.lineTo(1648,72);fwX.stroke();
+// 150 cursive signatures in a flowing grid (10 cols × 15 rows)
+const sigFonts=['italic 12px Brush Script MT,cursive','italic 11px Segoe Script,cursive','italic 13px Georgia','italic 10px Palatino,serif','italic 12px Comic Sans MS,cursive'];
 const sigNames=['A. Patel','R. Sharma','V. Kumar','S. Reddy','M. Khan','P. Singh','D. Gupta','K. Verma','N. Mehta','T. Joshi',
   'H. Shah','B. Rao','L. Nair','C. Pillai','G. Iyer','J. Menon','F. Ali','I. Das','O. Sen','U. Bose'];
 for(let r=0;r<15;r++) for(let c=0;c<10;c++){
-  const nm=sigNames[(r*10+c)%20]; // cycle through sample names
-  const sx2=55+c*95, sy2=158+r*23;
-  fwX.globalAlpha=0.4+Math.random()*0.4; // varying opacity for organic feel
+  const nm=sigNames[(r*10+c)%20];
+  const sx2=120+c*185, sy2=100+r*60;
+  fwX.font=sigFonts[(r*10+c)%5];
+  fwX.fillStyle=(r+c)%3===0?'#F9A825':'#a5d6a7'; // mix gold and green signatures
+  fwX.globalAlpha=0.15+Math.random()*0.2; // very subtle, transparent
   fwX.fillText(nm,sx2,sy2);
 }
 fwX.globalAlpha=1;
-// Bottom: "Est. 2026 — Phoenix, AZ"
-fwX.fillStyle='#F9A825';fwX.font='bold 14px Arial';fwX.fillText('Est. 2026  —  Phoenix, Arizona  —  Where Phoenix Plays Cricket',512,495);
 const fwT=new THREE.CanvasTexture(fwC);fwT.colorSpace=THREE.SRGBColorSpace;
-const fwM=new THREE.Mesh(new THREE.PlaneGeometry(24,12),new THREE.MeshBasicMaterial({map:fwT}));
-fwM.position.set(-10.5,6,LZf+VLD+0.5);scene.add(fwM);
-// Spotlight on founders wall
-const fwSpot=new THREE.SpotLight(0xfff5e6,0.6,20,Math.PI/5,0.5);
-fwSpot.position.set(-10.5,14,LZf+VLD+4);fwSpot.target.position.set(-10.5,5,LZf+VLD+0.5);
-scene.add(fwSpot);scene.add(fwSpot.target);
+const fwM=new THREE.Mesh(new THREE.PlaneGeometry(38,19),new THREE.MeshBasicMaterial({map:fwT,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+fwM.position.set(fwCx,7,LZf+VLD+0.25);scene.add(fwM);
+// Soft warm glow (not a spotlight — ambient wash)
+const fwLight=new THREE.PointLight(0xfff5e6,0.3,25);
+fwLight.position.set(fwCx,13,LZf+VLD+3);scene.add(fwLight);
 
 // Restroom fixtures — BEHIND opaque wall (not visible from entrance)
 // Men's (X: 4.5–16)
