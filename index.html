@@ -384,9 +384,15 @@ scene.add(eSpot);scene.add(eSpot.target);
 const sc=document.createElement('canvas');sc.width=1024;sc.height=160;
 const sx=sc.getContext('2d');
 sx.fillStyle='#0A1F0C';sx.fillRect(0,0,1024,160);
-sx.fillStyle='#F9A825';sx.font='bold 64px Arial';sx.textAlign='center';sx.fillText('ICC SPORTS AZ',512,70);
-sx.fillStyle='#81c784';sx.font='22px Arial';sx.fillText('Indoor Cricket Club  ·  North Phoenix',512,110);
-sx.fillStyle='#F9A825';sx.font='18px Arial';sx.fillText('iccsportsaz.com',512,142);
+// ICC Logo mark (green box with gold text)
+sx.fillStyle='#1B5E20';sx.fillRect(200,12,80,44);sx.strokeStyle='#F9A825';sx.lineWidth=2;sx.strokeRect(200,12,80,44);
+sx.fillStyle='#F9A825';sx.font='bold 28px Arial';sx.textAlign='center';sx.fillText('ICC',240,44);
+// Title
+sx.fillStyle='#F9A825';sx.font='bold 56px Arial';sx.fillText('ICC SPORTS AZ',560,52);
+sx.fillStyle='#81c784';sx.font='22px Arial';sx.fillText('Indoor Cricket Club  ·  North Phoenix',512,95);
+sx.fillStyle='#F9A825';sx.font='18px Arial';sx.fillText('iccsportsaz.com',512,130);
+// Thin gold line separator
+sx.strokeStyle='#F9A825';sx.lineWidth=1;sx.beginPath();sx.moveTo(300,65);sx.lineTo(724,65);sx.stroke();
 const st=new THREE.CanvasTexture(sc);st.colorSpace=THREE.SRGBColorSpace;
 const sm=new THREE.Mesh(new THREE.PlaneGeometry(20,3.2),new THREE.MeshBasicMaterial({map:st,side:THREE.DoubleSide}));
 sm.position.set(-5,H-1.5,D/2+1.5);scene.add(sm); // sign centered above glass opening, clearly exterior
@@ -429,8 +435,8 @@ B(3.5,H,0.6,0xf0f0f0,6.25,H/2,LZf+VLD,{r:0.75});
 B(0.2,7.5,0.6,0x9e9e9e,8,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});  // left frame
 B(0.2,7.5,0.6,0x9e9e9e,12,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true}); // right frame
 B(4,0.2,0.6,0x9e9e9e,10,7.6,LZf+VLD,{r:0.15,m:0.6,ns:true});    // header
-// Men's label above door
-Lbl("MEN'S",3,'#42A5F5',10,8.5,LZf+VLD-0.5);
+// Men's label above door (rotated to face lounge)
+Lbl("MEN'S",3,'#42A5F5',10,8.5,LZf+VLD-0.5,Math.PI);
 // ADA symbol next to Men's door
 B(0.6,0.6,0.05,0x42A5F5,12.8,5,LZf+VLD-0.35,{ns:true,n:"Men's Restroom Door",d:"ADA accessible. Push to enter."});
 
@@ -441,8 +447,8 @@ B(8,H,0.6,0xf0f0f0,16,H/2,LZf+VLD,{r:0.75});
 B(0.2,7.5,0.6,0x9e9e9e,20,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});
 B(0.2,7.5,0.6,0x9e9e9e,24,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});
 B(4,0.2,0.6,0x9e9e9e,22,7.6,LZf+VLD,{r:0.15,m:0.6,ns:true});
-// Women's label above door
-Lbl("WOMEN'S",3,'#E91E63',22,8.5,LZf+VLD-0.5);
+// Women's label above door (rotated to face lounge)
+Lbl("WOMEN'S",3,'#E91E63',22,8.5,LZf+VLD-0.5,Math.PI);
 B(0.6,0.6,0.05,0xE91E63,24.8,5,LZf+VLD-0.35,{ns:true,n:"Women's Restroom Door",d:"ADA accessible. Push to enter."});
 
 // Section 3: X=24 to 31.5 (between Women's and Storage doors)
@@ -451,7 +457,7 @@ B(7.5,H,0.6,0xf0f0f0,27.75,H/2,LZf+VLD,{r:0.75});
 B(0.2,7.5,0.6,0x9e9e9e,31.5,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});
 B(0.2,7.5,0.6,0x9e9e9e,35,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});
 B(3.5,0.2,0.6,0x9e9e9e,33.25,7.6,LZf+VLD,{r:0.15,m:0.6,ns:true});
-Lbl('STORAGE',2.5,'#90A4AE',33.25,8.5,LZf+VLD-0.5);
+Lbl('STORAGE',2.5,'#90A4AE',33.25,8.5,LZf+VLD-0.5,Math.PI);
 
 // Section 4: X=35 to 37.5 (right of Storage door)
 B(2.5,H,0.6,0xf0f0f0,36.25,H/2,LZf+VLD,{r:0.75});
@@ -477,9 +483,50 @@ B(0.7,0.02,0.55,0x42a5f5,-12,2.22,rcZ+0.5,{ns:true,r:0.05});
 B(3,2,0.15,0x111111,-14,6,LZf+VLD+0.5,{r:0.1,m:0.3,n:'Scoreboard Display',d:'Digital signage — live scores, booking status.'});
 B(2.7,1.7,0.05,0x0d47a1,-14,6,LZf+VLD+0.65,{ns:true,r:0.05,t:0.9});
 
-// Pro shop: compact wall-mounted display INSIDE reception (behind counter, low profile)
-// Only a small shelf at waist height — not visible from entrance eye level
-B(10,0.1,1.2,0x424242,-16,1.1,LZf+VLD+0.8,{r:0.2,m:0.4,ns:true}); // low shelf behind counter
+// ── FOUNDERS WALL — behind reception, facing the entrance ──────────────────
+// Premium display wall with ICC branding and 150 founding member signatures
+// Dark green backing panel mounted on the lounge-side wall
+B(26,10,0.3,0x0A1F0C,-10.5,6,LZf+VLD+0.3,{r:0.4,n:'Founders Wall',d:'150 Founding Members. Each signature represents a believer in ICC.'});
+// Gold border frame
+B(26.5,0.2,0.4,0xF9A825,-10.5,11.1,LZf+VLD+0.2,{m:0.6,r:0.1,ns:true}); // top
+B(26.5,0.2,0.4,0xF9A825,-10.5,0.9,LZf+VLD+0.2,{m:0.6,r:0.1,ns:true}); // bottom
+B(0.2,10.2,0.4,0xF9A825,-23.7,6,LZf+VLD+0.2,{m:0.6,r:0.1,ns:true}); // left
+B(0.2,10.2,0.4,0xF9A825,2.7,6,LZf+VLD+0.2,{m:0.6,r:0.1,ns:true});   // right
+// Founders Wall canvas (premium design)
+const fwC=document.createElement('canvas');fwC.width=1024;fwC.height=512;
+const fwX=fwC.getContext('2d');
+fwX.fillStyle='#0A1F0C';fwX.fillRect(0,0,1024,512);
+// Gold border
+fwX.strokeStyle='#F9A825';fwX.lineWidth=3;fwX.strokeRect(4,4,1016,504);
+fwX.strokeRect(10,10,1004,492);
+// ICC Logo mark (green box)
+fwX.fillStyle='#1B5E20';fwX.fillRect(440,20,144,50);
+fwX.fillStyle='#F9A825';fwX.font='bold 32px Arial';fwX.textAlign='center';fwX.fillText('ICC',512,55);
+// Title
+fwX.fillStyle='#F9A825';fwX.font='bold 28px Arial';fwX.fillText('FOUNDERS WALL',512,105);
+fwX.fillStyle='#81c784';fwX.font='16px Arial';fwX.fillText('150 Founding Members — The Believers Who Built This',512,130);
+// Horizontal gold line
+fwX.strokeStyle='#F9A825';fwX.lineWidth=1;fwX.beginPath();fwX.moveTo(100,142);fwX.lineTo(924,142);fwX.stroke();
+// Generate 150 signature-style names in a grid (10 cols × 15 rows)
+fwX.fillStyle='#a5d6a7';fwX.font='italic 10px Georgia';
+const sigNames=['A. Patel','R. Sharma','V. Kumar','S. Reddy','M. Khan','P. Singh','D. Gupta','K. Verma','N. Mehta','T. Joshi',
+  'H. Shah','B. Rao','L. Nair','C. Pillai','G. Iyer','J. Menon','F. Ali','I. Das','O. Sen','U. Bose'];
+for(let r=0;r<15;r++) for(let c=0;c<10;c++){
+  const nm=sigNames[(r*10+c)%20]; // cycle through sample names
+  const sx2=55+c*95, sy2=158+r*23;
+  fwX.globalAlpha=0.4+Math.random()*0.4; // varying opacity for organic feel
+  fwX.fillText(nm,sx2,sy2);
+}
+fwX.globalAlpha=1;
+// Bottom: "Est. 2026 — Phoenix, AZ"
+fwX.fillStyle='#F9A825';fwX.font='bold 14px Arial';fwX.fillText('Est. 2026  —  Phoenix, Arizona  —  Where Phoenix Plays Cricket',512,495);
+const fwT=new THREE.CanvasTexture(fwC);fwT.colorSpace=THREE.SRGBColorSpace;
+const fwM=new THREE.Mesh(new THREE.PlaneGeometry(24,12),new THREE.MeshBasicMaterial({map:fwT}));
+fwM.position.set(-10.5,6,LZf+VLD+0.5);scene.add(fwM);
+// Spotlight on founders wall
+const fwSpot=new THREE.SpotLight(0xfff5e6,0.6,20,Math.PI/5,0.5);
+fwSpot.position.set(-10.5,14,LZf+VLD+4);fwSpot.target.position.set(-10.5,5,LZf+VLD+0.5);
+scene.add(fwSpot);scene.add(fwSpot.target);
 
 // Restroom fixtures — BEHIND opaque wall (not visible from entrance)
 // Men's (X: 4.5–16)
@@ -532,17 +579,37 @@ for(const cx of [-22,14,28]){
   lm.position.set(cx,0.56,LZf+8);scene.add(lm);
   for(const[dx,dz]of[[-2.5,0],[2.5,0],[0,-2.5],[0,2.5]]){B(1.4,0.4,1.4,0x37474f,cx+dx,0.4,LZf+8+dz,{r:0.5});}
 }
-// Vending machines — 2 units along the back wall of the lounge (near room doors)
-// Left vending (snacks) — near equipment door
-B(2.2,6,1.8,0x1a237e,-W/2+2.2,3,LZf+VLD-2,{r:0.2,m:0.3,n:'Vending Machine',d:'Snacks & cold drinks.'});
-B(2.2,0.1,1.8,0xF9A825,-W/2+2.2,6.08,LZf+VLD-2,{ns:true}); // gold top strip
-B(1.8,3.5,0.07,0x1565c0,-W/2+2.2,3.5,LZf+VLD-2.9,{r:0.08,t:0.88,ns:true}); // screen glow
-Lbl('SNACKS',2,'#F9A825',-W/2+2.2,7,LZf+VLD-2);
-// Right vending (drinks) — near storage door
-B(2.2,6,1.8,0x1a237e,W/2-2.2,3,LZf+VLD-2,{r:0.2,m:0.3,n:'Vending Machine',d:'Energy & sports drinks.'});
-B(2.2,0.1,1.8,0xF9A825,W/2-2.2,6.08,LZf+VLD-2,{ns:true});
-B(1.8,3.5,0.07,0x1565c0,W/2-2.2,3.5,LZf+VLD-2.9,{r:0.08,t:0.88,ns:true});
-Lbl('DRINKS',2,'#F9A825',W/2-2.2,7,LZf+VLD-2);
+// ── Two vending machines SIDE BY SIDE (snacks + water) — right side of lounge ──
+// Positioned against the right wall, clearly visible from lounge center
+const vmX=W/2-4; // 4ft from right wall, side by side
+const vmZ=LZf+10; // in the lounge, near the corner booths
+// SNACKS vending machine (left unit)
+B(3,6.5,2,0x212121,vmX-1.8,3.25,vmZ,{r:0.15,m:0.2,n:'Vending Machine — Snacks',d:'Chips, chocolate, energy bars. Card & cash accepted.'});
+B(2.6,4,0.08,0x263238,vmX-1.8,3.5,vmZ-1.05,{r:0.08,ns:true}); // glass front panel
+B(2.4,3.6,0.04,0xffa726,vmX-1.8,3.5,vmZ-1.08,{ns:true,r:0.05,t:0.7}); // warm product glow
+B(3,0.1,2,0xF9A825,vmX-1.8,6.55,vmZ,{ns:true,m:0.5}); // gold top strip
+B(0.8,0.5,0.15,0x424242,vmX-1.8,1.5,vmZ-1.05,{r:0.3,m:0.5}); // coin/card slot
+// SNACKS label
+const sC=document.createElement('canvas');sC.width=256;sC.height=64;
+const sX=sC.getContext('2d');sX.fillStyle='#1a237e';sX.fillRect(0,0,256,64);
+sX.fillStyle='#F9A825';sX.font='bold 30px Arial';sX.textAlign='center';sX.fillText('SNACKS',128,42);
+const sT=new THREE.CanvasTexture(sC);sT.colorSpace=THREE.SRGBColorSpace;
+const sM=new THREE.Mesh(new THREE.PlaneGeometry(2.8,0.7),new THREE.MeshBasicMaterial({map:sT}));
+sM.position.set(vmX-1.8,6.2,vmZ-1.08);scene.add(sM);
+
+// WATER vending machine (right unit, side by side)
+B(3,6.5,2,0x0d47a1,vmX+1.8,3.25,vmZ,{r:0.15,m:0.2,n:'Vending Machine — Water',d:'Water, Gatorade, coconut water. Cold. Card & cash.'});
+B(2.6,4,0.08,0x1a237e,vmX+1.8,3.5,vmZ-1.05,{r:0.08,ns:true}); // glass front
+B(2.4,3.6,0.04,0x42a5f5,vmX+1.8,3.5,vmZ-1.08,{ns:true,r:0.05,t:0.7}); // cool blue glow
+B(3,0.1,2,0x42a5f5,vmX+1.8,6.55,vmZ,{ns:true,m:0.5}); // blue top strip
+B(0.8,0.5,0.15,0x424242,vmX+1.8,1.5,vmZ-1.05,{r:0.3,m:0.5}); // coin/card slot
+// WATER label
+const wC2=document.createElement('canvas');wC2.width=256;wC2.height=64;
+const wX2=wC2.getContext('2d');wX2.fillStyle='#0d47a1';wX2.fillRect(0,0,256,64);
+wX2.fillStyle='#ffffff';wX2.font='bold 30px Arial';wX2.textAlign='center';wX2.fillText('WATER',128,42);
+const wT2=new THREE.CanvasTexture(wC2);wT2.colorSpace=THREE.SRGBColorSpace;
+const wM2=new THREE.Mesh(new THREE.PlaneGeometry(2.8,0.7),new THREE.MeshBasicMaterial({map:wT2}));
+wM2.position.set(vmX+1.8,6.2,vmZ-1.08);scene.add(wM2);
 // 65" TVs on left and right walls (cricket / IPL)
 {const tvM=new THREE.MeshBasicMaterial({color:0x111111});const scM=new THREE.MeshBasicMaterial({color:0x0d1b3e});
 const tL=new THREE.Mesh(new THREE.BoxGeometry(0.2,4.2,7.2),tvM);tL.position.set(-W/2+0.1,9.2,LZf+9);scene.add(tL);
@@ -560,7 +627,7 @@ B(9.5,H,0.25,0xb0d8ff,-33.25,H/2,LZf+VLD+0.15,{r:0.02,m:0.06,t:0.13,ns:true,s:TH
 B(0.15,7.5,0.25,0x9e9e9e,-28,3.75,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true}); // frame left
 B(0.15,7.5,0.25,0x9e9e9e,-25,3.75,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true}); // frame right
 B(3,0.15,0.25,0x9e9e9e,-26.5,7.6,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true}); // header
-Lbl('EQUIPMENT',2.5,'#4CAF50',-26.5,8.5,LZf+VLD-0.3);
+Lbl('EQUIPMENT',2.5,'#4CAF50',-26.5,8.5,LZf+VLD-0.3,Math.PI);
 
 // Section: X=-25 to -8 (reception side, glass continues)
 B(17,H,0.25,0xb0d8ff,-16.5,H/2,LZf+VLD+0.15,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
@@ -703,10 +770,15 @@ function makeBoxCourt(cx,lineCol){
   const cd=new THREE.Mesh(new THREE.CircleGeometry(0.6,16),new THREE.MeshBasicMaterial({color:lineCol,transparent:true,opacity:0.55}));cd.rotation.x=-Math.PI/2;cd.position.set(cx,0.081,LZc);g.add(cd);
   // Pitch strip (center 10ft wide × 66ft long between creases)
   const ps=new THREE.Mesh(new THREE.PlaneGeometry(10,LL*0.73),new THREE.MeshStandardMaterial({color:0x8d6e63,roughness:0.5,transparent:true,opacity:0.35}));ps.rotation.x=-Math.PI/2;ps.position.set(cx,0.082,LZc);g.add(ps);
-  // Box cricket — single center wicket per end (1 stump, box cricket rules)
+  // Box cricket — 3 stumps + 2 bails per end (standard cricket wicket)
   for(const sz of[STf,STb]){
-    const st=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,2.6,8),new THREE.MeshStandardMaterial({color:0xffe082,roughness:0.3}));
-    st.position.set(cx,1.3,sz);st.castShadow=true;g.add(st);
+    for(let s=-1;s<=1;s++){
+      const st=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,2.4,6),new THREE.MeshStandardMaterial({color:0xffe082,roughness:0.3}));
+      st.position.set(cx+s*0.35,1.2,sz);st.castShadow=true;g.add(st);
+    }
+    // Bails
+    const bail=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.07,0.07),new THREE.MeshStandardMaterial({color:0xffe082,roughness:0.3}));
+    bail.position.set(cx,2.43,sz);g.add(bail);
   }
   return g;
 }
