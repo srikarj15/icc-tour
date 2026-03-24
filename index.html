@@ -406,9 +406,9 @@ logoImg.onload=function(){
   // Logo on entrance sign (exterior)
   const lm=new THREE.Mesh(new THREE.PlaneGeometry(3,3),new THREE.MeshBasicMaterial({map:lt,transparent:true,side:THREE.DoubleSide}));
   lm.position.set(-15,H-1.5,D/2+1.55);scene.add(lm);
-  // Logo on founders wall (interior, subtle)
-  const lm2=new THREE.Mesh(new THREE.PlaneGeometry(4,4),new THREE.MeshBasicMaterial({map:lt,transparent:true,opacity:0.5}));
-  lm2.position.set(0,11.5,LZf+VLD+0.3);scene.add(lm2);
+  // Logo on founders wall (behind reception, visible from entrance)
+  const lm2=new THREE.Mesh(new THREE.PlaneGeometry(3,3),new THREE.MeshBasicMaterial({map:lt,transparent:true,opacity:0.7}));
+  lm2.position.set(-10.5,11,D/2-0.25);scene.add(lm2);
 };
 logoImg.src='data:image/webp;base64,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';}
 inc(8);
@@ -498,47 +498,50 @@ B(0.7,0.02,0.55,0x42a5f5,-12,2.22,rcZ+0.5,{ns:true,r:0.05});
 B(3,2,0.15,0x111111,-14,6,LZf+VLD+0.5,{r:0.1,m:0.3,n:'Scoreboard Display',d:'Digital signage — live scores, booking status.'});
 B(2.7,1.7,0.05,0x0d47a1,-14,6,LZf+VLD+0.65,{ns:true,r:0.05,t:0.9});
 
-// ── FOUNDERS WALL — centered on lounge back wall, elegant & transparent ──────
-// Glass-backed panel with subtle signatures, centered on the separator wall
-const fwCx=0; // centered on building
-B(40,11,0.15,0xb0d8ff,fwCx,6.5,LZf+VLD+0.2,{r:0.02,m:0.06,t:0.08,ns:true,s:THREE.DoubleSide,n:'Founders Wall',d:'150 Founding Members. Each signature represents a believer in ICC.'});
-// Thin gold frame (elegant, not chunky)
-B(40.2,0.1,0.2,0xF9A825,fwCx,12,LZf+VLD+0.15,{m:0.7,r:0.1,ns:true});  // top
-B(40.2,0.1,0.2,0xF9A825,fwCx,1,LZf+VLD+0.15,{m:0.7,r:0.1,ns:true});   // bottom
-B(0.1,11,0.2,0xF9A825,-20,6.5,LZf+VLD+0.15,{m:0.7,r:0.1,ns:true});    // left
-B(0.1,11,0.2,0xF9A825,20,6.5,LZf+VLD+0.15,{m:0.7,r:0.1,ns:true});     // right
-// Founders Wall canvas (transparent bg, cursive signatures, classy)
-const fwC=document.createElement('canvas');fwC.width=2048;fwC.height=1024;
+// ── FOUNDERS WALL — behind receptionist, centered on reception zone ───────────
+// Mounted on the back wall of reception (Z=D/2-0.3), centered at X=-10.5 (reception center)
+// Does NOT overlap the passage (passage is X=-8 to +4, wall is at X=-23 to +2)
+const fwCx=-10.5; // reception center X
+const fwZ=D/2-0.4; // on the entrance-side back wall (behind receptionist, facing entrance)
+B(24,10,0.12,0x0A1F0C,fwCx,6,fwZ,{r:0.3,t:0.15,ns:true,s:THREE.DoubleSide,n:'Founders Wall',d:'150 Founding Members. Each signature represents a believer in ICC.'});
+// Thin gold frame
+B(24.2,0.08,0.15,0xF9A825,fwCx,11.05,fwZ,{m:0.7,r:0.1,ns:true}); // top
+B(24.2,0.08,0.15,0xF9A825,fwCx,0.95,fwZ,{m:0.7,r:0.1,ns:true});  // bottom
+B(0.08,10.1,0.15,0xF9A825,fwCx-12.1,6,fwZ,{m:0.7,r:0.1,ns:true});// left
+B(0.08,10.1,0.15,0xF9A825,fwCx+12.1,6,fwZ,{m:0.7,r:0.1,ns:true});// right
+// Founders Wall canvas — signatures that POP on dark glass
+const fwC=document.createElement('canvas');fwC.width=1024;fwC.height=512;
 const fwX=fwC.getContext('2d');
-// Transparent background (clear canvas)
-fwX.clearRect(0,0,2048,1024);
-// Subtle gold header — small, centered, not dominant
-fwX.fillStyle='#F9A825';fwX.globalAlpha=0.7;fwX.font='bold 24px Georgia';fwX.textAlign='center';
-fwX.fillText('FOUNDERS  WALL',1024,40);
-fwX.globalAlpha=0.4;fwX.font='italic 14px Georgia';
-fwX.fillText('150 Founding Members  ·  Est. 2026  ·  Phoenix, Arizona',1024,62);
-// Thin gold separator line
-fwX.strokeStyle='#F9A825';fwX.globalAlpha=0.3;fwX.lineWidth=0.5;
-fwX.beginPath();fwX.moveTo(400,72);fwX.lineTo(1648,72);fwX.stroke();
-// 150 cursive signatures in a flowing grid (10 cols × 15 rows)
-const sigFonts=['italic 12px Brush Script MT,cursive','italic 11px Segoe Script,cursive','italic 13px Georgia','italic 10px Palatino,serif','italic 12px Comic Sans MS,cursive'];
+fwX.clearRect(0,0,1024,512);
+// Header
+fwX.fillStyle='#F9A825';fwX.globalAlpha=1;fwX.font='bold 28px Georgia';fwX.textAlign='center';
+fwX.fillText('FOUNDERS  WALL',512,35);
+fwX.globalAlpha=0.8;fwX.font='italic 13px Georgia';fwX.fillStyle='#81c784';
+fwX.fillText('150 Founding Members  ·  Est. 2026  ·  Phoenix, Arizona',512,55);
+fwX.strokeStyle='#F9A825';fwX.globalAlpha=0.6;fwX.lineWidth=0.8;
+fwX.beginPath();fwX.moveTo(200,65);fwX.lineTo(824,65);fwX.stroke();
+// 150 BOLD cursive signatures — gold and white, high visibility
+const sigFonts=['italic bold 14px Brush Script MT,cursive','italic bold 13px Georgia','italic 15px Segoe Script,cursive','italic bold 12px Palatino,serif','italic 14px cursive'];
 const sigNames=['A. Patel','R. Sharma','V. Kumar','S. Reddy','M. Khan','P. Singh','D. Gupta','K. Verma','N. Mehta','T. Joshi',
   'H. Shah','B. Rao','L. Nair','C. Pillai','G. Iyer','J. Menon','F. Ali','I. Das','O. Sen','U. Bose'];
 for(let r=0;r<15;r++) for(let c=0;c<10;c++){
   const nm=sigNames[(r*10+c)%20];
-  const sx2=120+c*185, sy2=100+r*60;
+  const sx2=30+c*100, sy2=85+r*28;
   fwX.font=sigFonts[(r*10+c)%5];
-  fwX.fillStyle=(r+c)%3===0?'#F9A825':'#a5d6a7'; // mix gold and green signatures
-  fwX.globalAlpha=0.15+Math.random()*0.2; // very subtle, transparent
+  fwX.fillStyle=(r+c)%3===0?'#F9A825':'#ffffff'; // gold and WHITE for pop
+  fwX.globalAlpha=0.55+Math.random()*0.35; // 55-90% opacity — visible, not faint
   fwX.fillText(nm,sx2,sy2);
 }
 fwX.globalAlpha=1;
+// Bottom tagline
+fwX.fillStyle='#F9A825';fwX.font='bold 11px Arial';fwX.fillText('Where Phoenix Plays Cricket',512,500);
 const fwT=new THREE.CanvasTexture(fwC);fwT.colorSpace=THREE.SRGBColorSpace;
-const fwM=new THREE.Mesh(new THREE.PlaneGeometry(38,19),new THREE.MeshBasicMaterial({map:fwT,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
-fwM.position.set(fwCx,7,LZf+VLD+0.25);scene.add(fwM);
-// Soft warm glow (not a spotlight — ambient wash)
-const fwLight=new THREE.PointLight(0xfff5e6,0.3,25);
-fwLight.position.set(fwCx,13,LZf+VLD+3);scene.add(fwLight);
+const fwM=new THREE.Mesh(new THREE.PlaneGeometry(22,11),new THREE.MeshBasicMaterial({map:fwT,transparent:true,depthWrite:false}));
+fwM.position.set(fwCx,6,fwZ+0.1);scene.add(fwM);
+// Warm spotlight on founders wall
+const fwSpot=new THREE.SpotLight(0xfff5e6,0.5,15,Math.PI/4,0.6);
+fwSpot.position.set(fwCx,14,fwZ+5);fwSpot.target.position.set(fwCx,5,fwZ);
+scene.add(fwSpot);scene.add(fwSpot.target);
 
 // Restroom fixtures — BEHIND opaque wall (not visible from entrance)
 // Men's (X: 4.5–16)
