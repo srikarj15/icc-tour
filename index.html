@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ICC Sports AZ — 3D Virtual Tour v6</title>
+<title>ICC Sports AZ — 3D Virtual Tour v7</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { overflow:hidden; background:#0d1a10; font-family:'Segoe UI',system-ui,sans-serif; }
@@ -110,10 +110,10 @@ canvas:active { cursor:grabbing; }
 </head>
 <body>
 
-<div id="load"><h2>ICC SPORTS AZ</h2><p>Loading 3D Facility Tour v6...</p><div id="load-bar"><div id="load-fill"></div></div></div>
+<div id="load"><h2>ICC SPORTS AZ</h2><p>Loading 3D Facility Tour v7...</p><div id="load-bar"><div id="load-fill"></div></div></div>
 
 <div id="hud">
-  <h1>ICC SPORTS AZ — 3D Virtual Tour v6</h1>
+  <h1>ICC SPORTS AZ — 3D Virtual Tour v7</h1>
   <div class="sub">9,000 SF &nbsp;|&nbsp; 75 × 120 ft &nbsp;|&nbsp; 20 ft ceiling &nbsp;|&nbsp; Drag=Rotate &nbsp;·&nbsp; Scroll=Zoom &nbsp;·&nbsp; D=Dims &nbsp;·&nbsp; V=Version &nbsp;·&nbsp; N=Nets &nbsp;·&nbsp; 1–7=Views</div>
 </div>
 
@@ -264,15 +264,55 @@ function DL(x1,y1,z1,x2,y2,z2,lbl,col=0xFF6D00){
   const lb=new THREE.Mesh(new THREE.PlaneGeometry(6,1),new THREE.MeshBasicMaterial({map:t,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
   lb.position.set(mx,my,mz);dimG.add(lb);
 }
-DL(-W/2,0.5,D/2+4,W/2,0.5,D/2+4,'75 ft wide',0xF9A825);
-DL(-W/2-4,0.5,D/2,-W/2-4,0.5,-D/2,'120 ft deep',0xF9A825);
+// ── OVERALL BUILDING ──
+DL(-W/2,0.5,D/2+6,W/2,0.5,D/2+6,'75 ft wide',0xF9A825);
+DL(-W/2-6,0.5,D/2,-W/2-6,0.5,-D/2,'120 ft deep',0xF9A825);
 DL(-W/2-4,0.2,-D/2,-W/2-4,H,-D/2,'20 ft ceiling',0xFF6D00);
-DL(LX[0]-LW/2,0.5,LZf+4,LX[0]+LW/2,0.5,LZf+4,'10 ft lane',0x42A5F5);
-DL(LX[0]-LW/2-2,0.5,LZf,LX[0]-LW/2-2,0.5,LZb,'90 ft',0x42A5F5);
-DL(-LW*3,0.5,LZf+7,0,0.5,LZf+7,'30 ft court',0xF9A825);
-DL(-W/2,0.5,LZf+10,-W/2+7.5,0.5,LZf+10,'7.5 ft aisle',0x9C27B0);
-DL(W/2+3,0.5,D/2,W/2+3,0.5,LZf,'30 ft support',0x9C27B0);
-DL(W/2+3,0.5,LZf,W/2+3,0.5,LZf-VLD,'18 ft lounge',0x1565C0);
+
+// ── LANES (each lane + aisles) ──
+for(let i=0;i<LN;i++) DL(LX[i]-LW/2,0.3,LZf+2,LX[i]+LW/2,0.3,LZf+2,`L${i+1}: 10 ft`,0x42A5F5);
+DL(-W/2,0.3,LZf+4,-W/2+7.5,0.3,LZf+4,'7.5 ft aisle',0x9C27B0);
+DL(W/2-7.5,0.3,LZf+4,W/2,0.3,LZf+4,'7.5 ft aisle',0x9C27B0);
+// Lane length
+DL(LX[0]-LW/2-2,0.5,LZf,LX[0]-LW/2-2,0.5,LZb,'90 ft lanes',0x42A5F5);
+
+// ── ZONES (right side depth chain) ──
+const rx=W/2+4;
+DL(rx,0.5,D/2,rx,0.5,LZf+VLD,'12 ft rooms',0x9C27B0);
+DL(rx,0.5,LZf+VLD,rx,0.5,LZf,'18 ft lounge',0x1565C0);
+DL(rx,0.5,LZf,rx,0.5,STf,'12 ft run-up',0x4CAF50);
+DL(rx,0.5,STf,rx,0.5,STb,'66 ft pitch',0x8D6E63);
+DL(rx,0.5,STb,rx,0.5,LZb+8,'12 ft back',0x42A5F5);
+DL(rx,0.5,LZb+8,rx,0.5,LZb,'8 ft egress',0xFF6D00);
+
+// ── BOX COURT ──
+DL(-LW*3,0.5,LZf+8,0,0.5,LZf+8,'30 ft court',0xF9A825);
+
+// ── BACK-OF-HOUSE ROOMS (along entrance wall) ──
+const ry=D/2+2;
+DL(-W/2,0.3,ry,-25.5,0.3,ry,'12 ft equip',0x1B5E20);
+DL(-25.5,0.3,ry,4.5,0.3,ry,'30 ft reception',0xF9A825);
+DL(4.5,0.3,ry,27.5,0.3,ry,'23 ft restrooms',0x9C27B0);
+DL(27.5,0.3,ry,W/2,0.3,ry,'10 ft storage',0x607D8B);
+
+// ── ROOM DEPTH ──
+DL(-W/2-2,0.3,LZf+VLD,-W/2-2,0.3,D/2,'12 ft deep',0x9C27B0);
+
+// ── ENTRANCE OPENING ──
+DL(-15,0.3,D/2+4,5,0.3,D/2+4,'20 ft glass entry',0x4FC3F7);
+
+// ── STUMP POSITIONS ──
+DL(LX[2],0.3,STf+1,LX[2],0.3,STb-1,'66 ft pitch',0x8D6E63);
+
+// ── RESTROOM M/F SPLIT ──
+DL(4.5,0.3,D/2-2,16,0.3,D/2-2,'11.5 ft men',0x42A5F5);
+DL(16,0.3,D/2-2,27.5,0.3,D/2-2,'11.5 ft women',0xE91E63);
+
+// ── GLASS WALL ──
+DL(-W/2,0.3,LZf-2,W/2,0.3,LZf-2,'75 ft glass wall',0x4FC3F7);
+
+// ── BACK EGRESS BARRIER ──
+DL(-W/2,0.3,LZb+8-1,W/2,0.3,LZb+8-1,'safety barrier',0xFF6D00);
 let dimsVis=false;
 window.toggleDims=()=>{dimsVis=!dimsVis;dimG.visible=dimsVis;document.getElementById('md').classList.toggle('active',dimsVis);};
 
@@ -577,12 +617,12 @@ for(const dx of [-30,...divXPositions,30]){
   const rail=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,LL+1,6),new THREE.MeshStandardMaterial({color:pCol,roughness:0.2,metalness:0.75}));
   rail.position.set(dx,H-0.5,LZc);rail.rotation.x=Math.PI/2;grp.add(rail);
   // Net mesh
-  const nm=new THREE.Mesh(new THREE.PlaneGeometry(LL,H-0.8,22,10),new THREE.MeshStandardMaterial({color:nCol,transparent:true,opacity:0.08,side:THREE.DoubleSide,wireframe:true}));
+  const nm=new THREE.Mesh(new THREE.PlaneGeometry(LL,H-0.8,30,14),new THREE.MeshStandardMaterial({color:nCol,transparent:true,opacity:0.22,side:THREE.DoubleSide,wireframe:true}));
   nm.position.set(dx,H/2,LZc);nm.rotation.y=Math.PI/2;grp.add(nm);
 }
 // End nets
 for(const ez of [LZf,LZb]){
-  const en=new THREE.Mesh(new THREE.PlaneGeometry(60,H-0.8,15,10),new THREE.MeshStandardMaterial({color:0x90a4ae,transparent:true,opacity:0.06,side:THREE.DoubleSide,wireframe:true}));
+  const en=new THREE.Mesh(new THREE.PlaneGeometry(60,H-0.8,20,14),new THREE.MeshStandardMaterial({color:0x90a4ae,transparent:true,opacity:0.18,side:THREE.DoubleSide,wireframe:true}));
   en.position.set(0,H/2,ez);scene.add(en);
 }
 inc(8);
@@ -733,7 +773,7 @@ let netsVis=true;
 window.toggleNets=()=>{
   netsVis=!netsVis;
   for(const grp of Object.values(netGroups))
-    grp.traverse(c=>{if(c.material&&c.material.wireframe!==undefined)c.material.opacity=netsVis?0.08:0;});
+    grp.traverse(c=>{if(c.material&&c.material.wireframe!==undefined)c.material.opacity=netsVis?0.22:0;});
   document.getElementById('mn').classList.toggle('active',!netsVis);
 };
 
