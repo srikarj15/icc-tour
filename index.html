@@ -420,12 +420,41 @@ B(0.3,H,roomD,0xf0f0f0,27.5,H/2,SZ,{r:0.75});
 // Internal M/F restroom drywall divider
 B(0.3,H,roomD,0xe0e0e0,16,H/2,SZ,{r:0.7});
 
-// CRITICAL: Front wall for restrooms + back storage (blocks ALL view from entrance/lounge)
-// THICK solid wall at Z=LZf+VLD (=48), covering full span X: +4.5 to +37.5
-// No gaps, no door opening — restroom access is from the side corridor only
-B(33.5,H,0.8,0xf0f0f0,20.75,H/2,LZf+VLD,{r:0.75});
-// "RESTROOMS" sign on the wall face (lounge-facing side, subtle)
-Lbl('RESTROOMS',3.5,'#9e9e9e',16,5.5,LZf+VLD-0.5);
+// ── Front wall for restrooms + back storage (with door openings from lounge) ──
+// Wall sections with gaps for doors: Men's door at X≈10, Women's door at X≈22, Storage door at X≈34
+// Section 1: X=4.5 to 8 (left of Men's door)
+B(3.5,H,0.6,0xf0f0f0,6.25,H/2,LZf+VLD,{r:0.75});
+// Men's door opening: X=8 to 12 (4ft wide) — GAP
+// Door frame for Men's
+B(0.2,7.5,0.6,0x9e9e9e,8,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});  // left frame
+B(0.2,7.5,0.6,0x9e9e9e,12,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true}); // right frame
+B(4,0.2,0.6,0x9e9e9e,10,7.6,LZf+VLD,{r:0.15,m:0.6,ns:true});    // header
+// Men's label above door
+Lbl("MEN'S",3,'#42A5F5',10,8.5,LZf+VLD-0.5);
+// ADA symbol next to Men's door
+B(0.6,0.6,0.05,0x42A5F5,12.8,5,LZf+VLD-0.35,{ns:true,n:"Men's Restroom Door",d:"ADA accessible. Push to enter."});
+
+// Section 2: X=12 to 20 (between Men's and Women's doors)
+B(8,H,0.6,0xf0f0f0,16,H/2,LZf+VLD,{r:0.75});
+// Women's door opening: X=20 to 24 (4ft wide) — GAP
+// Door frame for Women's
+B(0.2,7.5,0.6,0x9e9e9e,20,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});
+B(0.2,7.5,0.6,0x9e9e9e,24,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});
+B(4,0.2,0.6,0x9e9e9e,22,7.6,LZf+VLD,{r:0.15,m:0.6,ns:true});
+// Women's label above door
+Lbl("WOMEN'S",3,'#E91E63',22,8.5,LZf+VLD-0.5);
+B(0.6,0.6,0.05,0xE91E63,24.8,5,LZf+VLD-0.35,{ns:true,n:"Women's Restroom Door",d:"ADA accessible. Push to enter."});
+
+// Section 3: X=24 to 31.5 (between Women's and Storage doors)
+B(7.5,H,0.6,0xf0f0f0,27.75,H/2,LZf+VLD,{r:0.75});
+// Storage door opening: X=31.5 to 35 (3.5ft wide) — GAP
+B(0.2,7.5,0.6,0x9e9e9e,31.5,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});
+B(0.2,7.5,0.6,0x9e9e9e,35,3.75,LZf+VLD,{r:0.15,m:0.6,ns:true});
+B(3.5,0.2,0.6,0x9e9e9e,33.25,7.6,LZf+VLD,{r:0.15,m:0.6,ns:true});
+Lbl('STORAGE',2.5,'#90A4AE',33.25,8.5,LZf+VLD-0.5);
+
+// Section 4: X=35 to 37.5 (right of Storage door)
+B(2.5,H,0.6,0xf0f0f0,36.25,H/2,LZf+VLD,{r:0.75});
 
 // ── Reception — Receptionist Faces the Entrance ─────────────────────────────
 // Counter near entrance wall (Z ≈ D/2-4), receptionist sits behind looking at door.
@@ -492,23 +521,28 @@ B(8,0.45,1.5,0x37474f,W/2-5.5,0.45,LZf+14,{r:0.5});
 B(7.8,0.1,1.3,0xc62828,W/2-5.5,0.68,LZf+14,{ns:true});
 B(8,1.1,0.15,0x212121,W/2-5.5,1.05,LZf+14.75,{r:0.4});
 B(5,0.07,3.5,0x424242,W/2-4.5,1.15,LZf+11,{r:0.2,m:0.5});
-// 3 round group tables with 4 chairs each — center hangout
-for(let i=0;i<3;i++){const cx=-20+i*20;
+// 3 round group tables — repositioned to keep center walkway clear
+// Tables at X=-22, X=+14, X=+28 (avoid the X=-8 to +4 passage zone)
+for(const cx of [-22,14,28]){
   const tg=new THREE.CylinderGeometry(1.3,1.3,0.08,16);
   const tm=new THREE.Mesh(tg,new THREE.MeshStandardMaterial({color:0x424242,roughness:0.2,metalness:0.5}));
-  tm.position.set(cx,1.12,LZf+12);scene.add(tm);
+  tm.position.set(cx,1.12,LZf+8);scene.add(tm);
   const lg=new THREE.CylinderGeometry(0.09,0.09,1.02,8);
   const lm=new THREE.Mesh(lg,new THREE.MeshStandardMaterial({color:0x616161,roughness:0.3,metalness:0.6}));
-  lm.position.set(cx,0.56,LZf+12);scene.add(lm);
-  for(const[dx,dz]of[[-2.5,0],[2.5,0],[0,-2.5],[0,2.5]]){B(1.4,0.4,1.4,0x37474f,cx+dx,0.4,LZf+12+dz,{r:0.5});}
+  lm.position.set(cx,0.56,LZf+8);scene.add(lm);
+  for(const[dx,dz]of[[-2.5,0],[2.5,0],[0,-2.5],[0,2.5]]){B(1.4,0.4,1.4,0x37474f,cx+dx,0.4,LZf+8+dz,{r:0.5});}
 }
-// Vending machines — left and right ends
-B(2.2,6,1.8,0x1a237e,-W/2+2.2,3,LZf+16.2,{r:0.2,m:0.3,n:'Vending Machine',d:'Snacks & drinks for members.'});
-B(2.2,0.1,1.8,0xF9A825,-W/2+2.2,6.08,LZf+16.2,{ns:true});
-B(1.8,3.5,0.07,0x1565c0,-W/2+2.2,3.5,LZf+15.3,{r:0.08,t:0.88,ns:true});
-B(2.2,6,1.8,0x1a237e,W/2-2.2,3,LZf+16.2,{r:0.2,m:0.3,n:'Vending Machine',d:'Energy & sports drinks for members.'});
-B(2.2,0.1,1.8,0xF9A825,W/2-2.2,6.08,LZf+16.2,{ns:true});
-B(1.8,3.5,0.07,0x1565c0,W/2-2.2,3.5,LZf+15.3,{r:0.08,t:0.88,ns:true});
+// Vending machines — 2 units along the back wall of the lounge (near room doors)
+// Left vending (snacks) — near equipment door
+B(2.2,6,1.8,0x1a237e,-W/2+2.2,3,LZf+VLD-2,{r:0.2,m:0.3,n:'Vending Machine',d:'Snacks & cold drinks.'});
+B(2.2,0.1,1.8,0xF9A825,-W/2+2.2,6.08,LZf+VLD-2,{ns:true}); // gold top strip
+B(1.8,3.5,0.07,0x1565c0,-W/2+2.2,3.5,LZf+VLD-2.9,{r:0.08,t:0.88,ns:true}); // screen glow
+Lbl('SNACKS',2,'#F9A825',-W/2+2.2,7,LZf+VLD-2);
+// Right vending (drinks) — near storage door
+B(2.2,6,1.8,0x1a237e,W/2-2.2,3,LZf+VLD-2,{r:0.2,m:0.3,n:'Vending Machine',d:'Energy & sports drinks.'});
+B(2.2,0.1,1.8,0xF9A825,W/2-2.2,6.08,LZf+VLD-2,{ns:true});
+B(1.8,3.5,0.07,0x1565c0,W/2-2.2,3.5,LZf+VLD-2.9,{r:0.08,t:0.88,ns:true});
+Lbl('DRINKS',2,'#F9A825',W/2-2.2,7,LZf+VLD-2);
 // 65" TVs on left and right walls (cricket / IPL)
 {const tvM=new THREE.MeshBasicMaterial({color:0x111111});const scM=new THREE.MeshBasicMaterial({color:0x0d1b3e});
 const tL=new THREE.Mesh(new THREE.BoxGeometry(0.2,4.2,7.2),tvM);tL.position.set(-W/2+0.1,9.2,LZf+9);scene.add(tL);
@@ -518,9 +552,29 @@ const sR=new THREE.Mesh(new THREE.PlaneGeometry(6.8,3.8),scM);sR.position.set(W/
 // Lounge floor tint
 const vlF=new THREE.Mesh(new THREE.PlaneGeometry(W,VLD),new THREE.MeshStandardMaterial({color:0x1a237e,transparent:true,opacity:0.18}));
 vlF.rotation.x=-Math.PI/2;vlF.position.set(0,0.02,LZf+VLD/2);scene.add(vlF);
-Lbl('VIEWING LOUNGE  —  75 x 18 ft  |  Corner Booths  |  2x65" TVs  |  ADA Fountain',11,'#90caf9',0,13,LZf+VLD/2);
-// Separator glass wall between lounge and back rooms
-B(W,H,0.25,0xb0d8ff,0,H/2,LZf+VLD+0.15,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+Lbl('VIEWING LOUNGE  —  75 x 18 ft  |  Corner Booths  |  2x65" TVs  |  Vending  |  ADA Fountain',11,'#90caf9',0,13,LZf+VLD/2);
+// Separator glass wall between lounge and back rooms — WITH passage opening
+// Left section: X=-37.5 to -28 (equipment side, with door gap at -28 to -25)
+B(9.5,H,0.25,0xb0d8ff,-33.25,H/2,LZf+VLD+0.15,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+// Equipment Storage door opening: X=-28 to -25 (3ft) — GAP
+B(0.15,7.5,0.25,0x9e9e9e,-28,3.75,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true}); // frame left
+B(0.15,7.5,0.25,0x9e9e9e,-25,3.75,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true}); // frame right
+B(3,0.15,0.25,0x9e9e9e,-26.5,7.6,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true}); // header
+Lbl('EQUIPMENT',2.5,'#4CAF50',-26.5,8.5,LZf+VLD-0.3);
+
+// Section: X=-25 to -8 (reception side, glass continues)
+B(17,H,0.25,0xb0d8ff,-16.5,H/2,LZf+VLD+0.15,{r:0.02,m:0.06,t:0.13,ns:true,s:THREE.DoubleSide});
+
+// MAIN PASSAGE from reception to lounge: X=-8 to +4 (12ft wide opening) — GAP
+// This is how visitors walk from reception into the lounge
+// Passage frame (minimal, welcoming)
+B(0.2,H,0.25,0x9e9e9e,-8,H/2,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true}); // left pillar
+B(0.2,H,0.25,0x9e9e9e,4,H/2,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true});  // right pillar
+B(12,0.2,0.25,0x9e9e9e,-2,H,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true});   // header beam
+// Floor transition strip at passage
+B(12,0.06,0.5,0xF9A825,-2,0.04,LZf+VLD+0.15,{ns:true,m:0.5});
+
+// Right section: X=+4 to +37.5 (restroom front wall handles this section — already opaque)
 inc(6);
 
 // ── Cricket lanes ─────────────────────────────────────────────────────────────
