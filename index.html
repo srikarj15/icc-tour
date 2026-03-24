@@ -389,18 +389,28 @@ scene.add(eSpot);scene.add(eSpot.target);
 const sc=document.createElement('canvas');sc.width=1024;sc.height=160;
 const sx=sc.getContext('2d');
 sx.fillStyle='#0A1F0C';sx.fillRect(0,0,1024,160);
-// ICC Logo mark (green box with gold text)
-sx.fillStyle='#1B5E20';sx.fillRect(200,12,80,44);sx.strokeStyle='#F9A825';sx.lineWidth=2;sx.strokeRect(200,12,80,44);
-sx.fillStyle='#F9A825';sx.font='bold 28px Arial';sx.textAlign='center';sx.fillText('ICC',240,44);
-// Title
-sx.fillStyle='#F9A825';sx.font='bold 56px Arial';sx.fillText('ICC SPORTS AZ',560,52);
+// Title text (logo will be a separate mesh)
+sx.fillStyle='#F9A825';sx.font='bold 56px Arial';sx.textAlign='center';sx.fillText('ICC SPORTS AZ',560,52);
 sx.fillStyle='#81c784';sx.font='22px Arial';sx.fillText('Indoor Cricket Club  ·  North Phoenix',512,95);
 sx.fillStyle='#F9A825';sx.font='18px Arial';sx.fillText('iccsportsaz.com',512,130);
-// Thin gold line separator
 sx.strokeStyle='#F9A825';sx.lineWidth=1;sx.beginPath();sx.moveTo(300,65);sx.lineTo(724,65);sx.stroke();
 const st=new THREE.CanvasTexture(sc);st.colorSpace=THREE.SRGBColorSpace;
 const sm=new THREE.Mesh(new THREE.PlaneGeometry(20,3.2),new THREE.MeshBasicMaterial({map:st,side:THREE.DoubleSide}));
-sm.position.set(-5,H-1.5,D/2+1.5);scene.add(sm); // sign centered above glass opening, clearly exterior
+sm.position.set(-5,H-1.5,D/2+1.5);scene.add(sm);
+// Real ICC Logo crest (loaded from embedded image)
+{const logoImg=new Image();
+logoImg.onload=function(){
+  const lc=document.createElement('canvas');lc.width=128;lc.height=128;
+  lc.getContext('2d').drawImage(logoImg,0,0,128,128);
+  const lt=new THREE.CanvasTexture(lc);lt.colorSpace=THREE.SRGBColorSpace;
+  // Logo on entrance sign (exterior)
+  const lm=new THREE.Mesh(new THREE.PlaneGeometry(3,3),new THREE.MeshBasicMaterial({map:lt,transparent:true,side:THREE.DoubleSide}));
+  lm.position.set(-15,H-1.5,D/2+1.55);scene.add(lm);
+  // Logo on founders wall (interior, subtle)
+  const lm2=new THREE.Mesh(new THREE.PlaneGeometry(4,4),new THREE.MeshBasicMaterial({map:lt,transparent:true,opacity:0.5}));
+  lm2.position.set(0,11.5,LZf+VLD+0.3);scene.add(lm2);
+};
+logoImg.src='data:image/webp;base64,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';}
 inc(8);
 
 // ── Support zone back rooms (Z: +48 to +60, 12ft deep) ───────────────────────
