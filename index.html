@@ -156,8 +156,8 @@ canvas:active { cursor:grabbing; }
   <div class="sr"><span class="k">Footprint</span><span class="v">75 × 120 ft</span></div>
   <div class="sr"><span class="k">Ceiling</span><span class="v">20 ft clear</span></div>
   <div class="sr"><span class="k">Lanes</span><span class="v">6 × 10 ft wide</span></div>
-  <div class="sr"><span class="k">Lane length</span><span class="v">90 ft playing</span></div>
-  <div class="sr"><span class="k">Box court</span><span class="v">30 × 90 ft</span></div>
+  <div class="sr"><span class="k">Lane length</span><span class="v">66 ft pitch + 24 ft buffer</span></div>
+  <div class="sr"><span class="k">Box court</span><span class="v">30 × 90 ft (66 ft pitch)</span></div>
   <div class="sr"><span class="k">Side aisles</span><span class="v">7.5 ft each</span></div>
   <div class="sr"><span class="k">Support zone</span><span class="v">30 ft deep</span></div>
   <div class="sr"><span class="k">Viewing lounge</span><span class="v">75 × 18 ft</span></div>
@@ -288,7 +288,7 @@ for(let i=0;i<LN;i++) DL(LX[i]-LW/2,0.3,LZf+2,LX[i]+LW/2,0.3,LZf+2,`L${i+1}: 10 
 DL(-W/2,0.3,LZf+4,-W/2+7.5,0.3,LZf+4,'7.5 ft aisle',0x9C27B0);
 DL(W/2-7.5,0.3,LZf+4,W/2,0.3,LZf+4,'7.5 ft aisle',0x9C27B0);
 // Lane length
-DL(LX[0]-LW/2-2,0.5,LZf,LX[0]-LW/2-2,0.5,LZb,'90 ft lanes',0x42A5F5);
+DL(LX[0]-LW/2-2,0.5,LZf,LX[0]-LW/2-2,0.5,LZb,'66 ft pitch + 24 ft buffer',0x42A5F5);
 
 // ── ZONES (right side depth chain) ──
 const rx=W/2+4;
@@ -339,12 +339,17 @@ inc(5);
 const gnd=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshStandardMaterial({color:0x080e08,roughness:0.95}));gnd.rotation.x=-Math.PI/2;gnd.position.y=-0.06;scene.add(gnd);
 const flr=new THREE.Mesh(new THREE.PlaneGeometry(W+0.4,D+0.4),new THREE.MeshStandardMaterial({color:0x18201a,roughness:0.3,metalness:0.06}));
 flr.rotation.x=-Math.PI/2;flr.position.y=0.01;flr.receiveShadow=true;scene.add(flr);
+flr.userData={name:'Facility Floor',desc:'Polished concrete base. Lanes: coir turf matting. Run-up: rubberized mat. Lounge: LVT plank. Restrooms: non-slip ceramic tile.'};iObj.push(flr);
 inc(4);
 
 // ── Ceiling + trusses ─────────────────────────────────────────────────────────
 const ceil=new THREE.Mesh(new THREE.PlaneGeometry(W,D),new THREE.MeshStandardMaterial({color:0xf2f2f2,roughness:0.8}));
 ceil.rotation.x=Math.PI/2;ceil.position.y=H;scene.add(ceil);
 for(let i=0;i<6;i++) B(W-1,1.1,0.5,0x607d8b,0,H-0.6,-D/2+10+i*20,{r:0.3,m:0.7,ns:true});
+// Acoustic ceiling panels (NRC 0.7) — v8: shown as grey rectangles between trusses
+for(let ax=-25;ax<=25;ax+=12.5) for(let az=-40;az<=30;az+=20){
+  B(10,0.15,16,0x9e9e9e,ax,H-0.3,az,{r:0.95,ns:true,n:'Acoustic Panel',d:'NRC 0.7 mineral fiber — noise reduction for indoor cricket (100+ dB).'});
+}
 
 // ── Walls ─────────────────────────────────────────────────────────────────────
 const wM=new THREE.MeshStandardMaterial({color:0xf0f0f0,roughness:0.75});
@@ -479,9 +484,9 @@ function WoodDoor(cx,dw,dh,label,labelCol,faceZ){
   dm.position.set(cx,dh*0.82,dz-0.47);scene.add(dm);
 }
 // Men's door (X=10, 3.5ft wide, 7.5ft tall)
-WoodDoor(10,3.5,7.5,"MEN'S",'#42A5F5');
+WoodDoor(10,3.0,7.5,"MEN'S",'#42A5F5');
 // Women's door (X=22, 3.5ft wide, 7.5ft tall)
-WoodDoor(22,3.5,7.5,"WOMEN'S",'#E91E63');
+WoodDoor(22,3.0,7.5,"WOMEN'S",'#E91E63');
 // Storage door (X=33.25, 3ft wide, 7.5ft tall)
 WoodDoor(33.25,3,7.5,'STORAGE','#90A4AE');
 
@@ -499,6 +504,11 @@ B(12,0.12,2.2,0xF9A825,-14,1.67,rcZ,{m:0.5,r:0.15,ns:true}); // gold counter top
 // POS terminal on counter (faces entrance — customer can see screen)
 B(0.8,0.5,0.6,0x111111,-12,1.95,rcZ+0.5,{r:0.15,m:0.3});
 B(0.7,0.02,0.55,0x42a5f5,-12,2.22,rcZ+0.5,{ns:true,r:0.05});
+// Pro shop retail display — wall-mounted shelving with cricket gear
+B(6,4,0.6,0x37474f,-20,2.5,D/2-1,{r:0.4,n:'Pro Shop Display',d:'Cricket bats, pads, helmets, gloves. India-sourced gear + premium brands.'});
+B(5.6,0.08,0.55,0x455a64,-20,1.5,D/2-0.7,{r:0.3,ns:true}); // shelf 1
+B(5.6,0.08,0.55,0x455a64,-20,2.5,D/2-0.7,{r:0.3,ns:true}); // shelf 2
+B(5.6,0.08,0.55,0x455a64,-20,3.5,D/2-0.7,{r:0.3,ns:true}); // shelf 3
 
 // Booking monitor — wall-mounted on back wall behind receptionist (faces entrance)
 B(3,2,0.15,0x111111,-14,6,LZf+VLD+0.5,{r:0.1,m:0.3,n:'Scoreboard Display',d:'Digital signage — live scores, booking status.'});
@@ -565,6 +575,7 @@ inc(8);
 // ── Expanded Viewing Lounge (Z: +30 to +48, 18ft deep desi hangout) ──────────
 const gw=new THREE.Mesh(new THREE.PlaneGeometry(W,H),new THREE.MeshStandardMaterial({color:0xb0d8ff,transparent:true,opacity:0.1,roughness:0.02,metalness:0.05,side:THREE.DoubleSide}));
 gw.position.set(0,H/2,LZf);scene.add(gw);
+gw.userData={name:'Safety Glass Wall',desc:'75 ft laminated safety glass — 1/2"+1/2" laminated tempered, rated for 80+ mph ball impact. IBC Ch. 24.'};iObj.push(gw);
 for(const fy of [0,H/3,2*H/3,H]) B(W,0.1,0.08,0x78909c,0,fy,LZf,{ns:true,m:0.8,r:0.2});
 // Lane-front bench — cricket side of glass, run-up start, players sit facing the nets
 for(let i=0;i<LN;i++){const lx=LX[i];
@@ -639,10 +650,10 @@ const wM2=new THREE.Mesh(new THREE.PlaneGeometry(2.8,0.7),new THREE.MeshBasicMat
 wM2.position.set(vmX+1.8,6.2,vmZ-1.08);scene.add(wM2);
 // 65" TVs on left and right walls (cricket / IPL)
 {const tvM=new THREE.MeshBasicMaterial({color:0x111111});const scM=new THREE.MeshBasicMaterial({color:0x0d1b3e});
-const tL=new THREE.Mesh(new THREE.BoxGeometry(0.2,4.2,7.2),tvM);tL.position.set(-W/2+0.1,9.2,LZf+9);scene.add(tL);
-const sL=new THREE.Mesh(new THREE.PlaneGeometry(6.8,3.8),scM);sL.position.set(-W/2+0.22,9.2,LZf+9);sL.rotation.y=Math.PI/2;scene.add(sL);
-const tR=new THREE.Mesh(new THREE.BoxGeometry(0.2,4.2,7.2),tvM);tR.position.set(W/2-0.1,9.2,LZf+9);scene.add(tR);
-const sR=new THREE.Mesh(new THREE.PlaneGeometry(6.8,3.8),scM);sR.position.set(W/2-0.22,9.2,LZf+9);sR.rotation.y=-Math.PI/2;scene.add(sR);}
+const tL=new THREE.Mesh(new THREE.BoxGeometry(0.2,4.2,7.2),tvM);tL.position.set(-W/2+0.1,6.5,LZf+9);scene.add(tL);
+const sL=new THREE.Mesh(new THREE.PlaneGeometry(6.8,3.8),scM);sL.position.set(-W/2+0.22,6.5,LZf+9);sL.rotation.y=Math.PI/2;scene.add(sL);
+const tR=new THREE.Mesh(new THREE.BoxGeometry(0.2,4.2,7.2),tvM);tR.position.set(W/2-0.1,6.5,LZf+9);scene.add(tR);
+const sR=new THREE.Mesh(new THREE.PlaneGeometry(6.8,3.8),scM);sR.position.set(W/2-0.22,6.5,LZf+9);sR.rotation.y=-Math.PI/2;scene.add(sR);}
 // Lounge floor tint
 const vlF=new THREE.Mesh(new THREE.PlaneGeometry(W,VLD),new THREE.MeshStandardMaterial({color:0x1a237e,transparent:true,opacity:0.35}));
 vlF.rotation.x=-Math.PI/2;vlF.position.set(0,0.04,LZf+VLD/2);scene.add(vlF);
@@ -668,6 +679,9 @@ B(0.2,H,0.25,0x9e9e9e,4,H/2,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true});  // right pill
 B(12,0.2,0.25,0x9e9e9e,-2,H,LZf+VLD+0.15,{r:0.15,m:0.6,ns:true});   // header beam
 // Floor transition strip at passage
 B(12,0.06,0.5,0xF9A825,-2,0.04,LZf+VLD+0.15,{ns:true,m:0.5});
+// ADA accessible route marking — tactile strip through passage
+B(1,0.04,4,0xF9A825,-2,0.05,LZf+VLD+2,{ns:true,m:0.5});
+Lbl('\u267f ACCESSIBLE ROUTE',3,'#F9A825',-2,0.6,LZf+VLD+3);
 
 // Right section: X=+4 to +37.5 (restroom front wall handles this section — already opaque)
 inc(6);
@@ -700,6 +714,8 @@ for(let i=0;i<LN;i++){
   ps.rotation.x=-Math.PI/2;ps.position.set(lx,0.12,LZc);scene.add(ps);
   // Crease lines
   for(const cz of [STf+4,STb-4]){const cm=new THREE.Mesh(new THREE.PlaneGeometry(LW-0.5,0.1),new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.4}));cm.rotation.x=-Math.PI/2;cm.position.set(lx,0.15,cz);scene.add(cm);}
+  // Bowling crease at stumps (thinner line to distinguish from popping crease)
+  for(const cz of [STf,STb]){const bc=new THREE.Mesh(new THREE.PlaneGeometry(LW-0.5,0.06),new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.4,transparent:true,opacity:0.7}));bc.rotation.x=-Math.PI/2;bc.position.set(lx,0.14,cz);scene.add(bc);}
   // Half-way crease
   const hm=new THREE.Mesh(new THREE.PlaneGeometry(LW-0.5,0.1),new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.4,transparent:true,opacity:0.5}));
   hm.rotation.x=-Math.PI/2;hm.position.set(lx,0.16,LZc);scene.add(hm);
@@ -710,7 +726,7 @@ for(let i=0;i<LN;i++){
     sg.position.set(lx-0.35+s*0.35,1.2,sz);sg.castShadow=true;stGrp.add(sg);
   }
   // Bail bar
-  for(const sz of [STf,STb]) Bg(stGrp,0.6,0.07,0.07,0xD4A437,lx,2.43,sz,{ns:true});
+  for(const sz of [STf,STb]) Bg(stGrp,0.6,0.07,0.07,0xD4A437,lx,2.78,sz,{ns:true});
   // Bowling machine (L1 and L4) — detailed: body + wheel + feeder hopper + ball bin
   if(i===0||i===3){
     B(1.4,2,1.4,0x424242,lx,1,STf+4,{r:0.25,m:0.6,n:'Bowling Machine',d:'BOLA Professional — variable speed 40–90 mph. 2 machines total, mobile for any lane.'});
@@ -721,6 +737,13 @@ for(let i=0;i<LN;i++){
     ft.position.set(lx,2.8,STf+3.5);ft.rotation.x=Math.PI/6;scene.add(ft);
     // Ball bin beside machine
     B(1.2,0.8,1.2,0x263238,lx+1.8,0.4,STf+4,{r:0.4,n:'Ball Bin',d:'Cricket balls for bowling machine. 12-ball capacity.'});
+    // Safety enclosure frame — orange posts + top rail (v8: bowling machine safety)
+    B(0.1,3,0.1,0xff6d00,lx-1.2,1.5,STf+2.6,{r:0.3,m:0.5,ns:true});
+    B(0.1,3,0.1,0xff6d00,lx+1.2,1.5,STf+2.6,{r:0.3,m:0.5,ns:true});
+    B(0.1,3,0.1,0xff6d00,lx-1.2,1.5,STf+5.4,{r:0.3,m:0.5,ns:true});
+    B(0.1,3,0.1,0xff6d00,lx+1.2,1.5,STf+5.4,{r:0.3,m:0.5,ns:true});
+    B(2.4,0.1,2.8,0xff6d00,lx,3.05,STf+4,{r:0.3,m:0.5,ns:true}); // top rail
+    Lbl('\u26a0 MACHINE ZONE',3,'#ff6d00',lx,3.8,STf+2.5);
     // 3 cricket balls in bin
     for(const[bx,bz]of[[0,0],[0.3,0.25],[-0.25,0.15]]){
       const cb=new THREE.Mesh(new THREE.SphereGeometry(0.18,8,8),new THREE.MeshStandardMaterial({color:0xD32F2F,roughness:0.6}));
@@ -728,6 +751,9 @@ for(let i=0;i<LN;i++){
     }
   }
   Lbl(`L${i+1}`,4.5,isR?'#F9A825':'#81c784',lx,14.5,LZf-2);
+  // Lane scoreboard display
+  B(3,1.8,0.12,0x111111,lx,11,LZf-0.3,{r:0.1,m:0.3,ns:true,n:`Lane ${i+1} Scoreboard`,d:'Digital scoreboard — runs, wickets, overs.'});
+  B(2.7,1.5,0.04,0x1a237e,lx,11,LZf-0.42,{ns:true,r:0.05,t:0.85});
 }
 // Run-up overlay (front, 12ft)
 const ruF=new THREE.Mesh(new THREE.PlaneGeometry(W-2,12),new THREE.MeshStandardMaterial({color:0x4caf50,transparent:true,opacity:0.18}));
@@ -779,7 +805,7 @@ for(const dx of [-30,...divXPositions,30]){
   const rail=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,LL+1,6),new THREE.MeshStandardMaterial({color:pCol,roughness:0.2,metalness:0.75}));
   rail.position.set(dx,H-0.5,LZc);rail.rotation.x=Math.PI/2;grp.add(rail);
   // Net mesh
-  const nm=new THREE.Mesh(new THREE.PlaneGeometry(LL,H-0.8,30,14),new THREE.MeshStandardMaterial({color:nCol,transparent:true,opacity:0.22,side:THREE.DoubleSide,wireframe:true}));
+  const nm=new THREE.Mesh(new THREE.PlaneGeometry(LL,H-0.8,30,14),new THREE.MeshStandardMaterial({color:nCol,transparent:true,opacity:0.35,side:THREE.DoubleSide,wireframe:true}));
   nm.position.set(dx,H/2,LZc);nm.rotation.y=Math.PI/2;grp.add(nm);
 }
 // End nets
@@ -801,6 +827,8 @@ function makeBoxCourt(cx,lineCol){
   const hl=new THREE.Mesh(new THREE.PlaneGeometry(hw*2,LK*0.6),new THREE.MeshBasicMaterial({color:lineCol,transparent:true,opacity:0.7}));hl.rotation.x=-Math.PI/2;hl.position.set(cx,0.22,LZc);g.add(hl);
   // Crease lines at both bowling ends (12ft inside from each end)
   for(const cz of[STf,STb]){const cr=new THREE.Mesh(new THREE.PlaneGeometry(hw*2-0.5,LK*0.6),new THREE.MeshBasicMaterial({color:0xffffff}));cr.rotation.x=-Math.PI/2;cr.position.set(cx,0.23,cz);g.add(cr);}
+  // Bowling crease at stumps
+  for(const cz of[STf,STb]){const bc=new THREE.Mesh(new THREE.PlaneGeometry(hw*2-0.5,LK*0.4),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.6}));bc.rotation.x=-Math.PI/2;bc.position.set(cx,0.235,cz);g.add(bc);}
   // Return crease side stubs at both ends
   for(const cz of[STf,STb]) for(const bx of[-1,1]){const rc=new THREE.Mesh(new THREE.PlaneGeometry(LK*0.5,4),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.8}));rc.rotation.x=-Math.PI/2;rc.position.set(cx+bx*(hw-3),0.23,cz+(cz>0?-2:2));g.add(rc);}
   // Penalty zone highlights at both ends (last 8ft = danger zone)
@@ -819,7 +847,7 @@ function makeBoxCourt(cx,lineCol){
     }
     // Bails
     const bail=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.07,0.07),new THREE.MeshStandardMaterial({color:0xffe082,roughness:0.3}));
-    bail.position.set(cx,2.43,sz);g.add(bail);
+    bail.position.set(cx,2.78,sz);g.add(bail);
   }
   return g;
 }
@@ -845,8 +873,8 @@ function ExSign(x,y,z,ry){
   const m=new THREE.Mesh(new THREE.PlaneGeometry(2.4,0.9),new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide}));
   m.position.set(x,y,z);if(ry)m.rotation.y=ry;scene.add(m);
 }
-ExSign(-W/2+0.7,H-1.5,0,Math.PI/2);ExSign(W/2-0.7,H-1.5,0,-Math.PI/2);ExSign(0,H-1.5,-D/2+0.7,0);
-for(const [fx,fz] of [[-W/2+1,D/4],[-W/2+1,-D/4],[W/2-1,D/4],[W/2-1,-D/4],[0,-D/2+1]])
+ExSign(-W/2+0.7,H-1.5,0,Math.PI/2);ExSign(W/2-0.7,H-1.5,0,-Math.PI/2);ExSign(0,H-1.5,-D/2+0.7,0);ExSign(0,H-1.5,D/2-0.7,Math.PI);
+for(const [fx,fz] of [[-W/2+1,D/4],[-W/2+1,-D/4],[W/2-1,D/4],[W/2-1,-D/4],[0,-D/2+1],[-W/2+1,0],[W/2-1,0],[0,D/4]])
   B(0.45,1.35,0.22,0xD32F2F,fx,2,fz,{r:0.3,ns:true});
 
 // ── Code Compliance Items (IBC 2024 / Bret Tarver / ADA) ──────────────────────
@@ -856,7 +884,7 @@ B(2.8,0.15,0.3,0xD32F2F,W/2-0.6,3.2,0,{r:0.3,m:0.5,n:'Panic Hardware',d:'Crash b
 B(2.8,0.15,0.3,0xD32F2F,0,3.2,-D/2+0.3,{r:0.3,m:0.5,n:'Panic Hardware',d:'Crash bar — rear exit, IBC §1010.1.10.'});
 // Sprinkler heads — Bret Tarver Ordinance (NFPA 13 wet pipe, ~15ft spacing) — v8: InstancedMesh
 const _spPos=[];
-for(let sx=-30;sx<=30;sx+=15)for(let sz=-50;sz<=50;sz+=15)_spPos.push([sx,sz]);
+for(let sx=-35;sx<=35;sx+=15)for(let sz=-55;sz<=55;sz+=15)_spPos.push([sx,sz]);
 const _spHG=new THREE.CylinderGeometry(0.25,0.35,0.15,8);
 const _spHM=new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.3,metalness:0.5});
 const _spRG=new THREE.CylinderGeometry(0.04,0.04,0.4,6);
@@ -872,11 +900,14 @@ window.__sprinklerIM=spHeadIM;window.__sprinklerCount=_spPos.length;
 // Fire alarm pull station — IBC §907.2.1 (near main entrance)
 B(0.6,0.8,0.15,0xD32F2F,13,4,D/2-0.5,{r:0.3,n:'Fire Alarm Pull Station',d:'Manual pull station — IBC §907.2.1. Near main entrance.'});
 B(0.5,0.35,0.02,0xffffff,13,4.15,D/2-0.42,{ns:true});
+// Second fire alarm pull station — rear lane area (IBC §907.2.1, max 75ft travel)
+B(0.6,0.8,0.15,0xD32F2F,0,4,-30,{r:0.3,n:'Fire Alarm Pull Station',d:'Rear pull station — IBC §907.2.1. Max 75ft travel distance.'});
+B(0.5,0.35,0.02,0xffffff,0,4.15,-29.92,{ns:true});
 // ADA drinking fountain — IBC §2902.7 / ADA §211 (near glass wall transition)
 B(1.5,3.2,0.6,0xb0bec5,W/2-1.5,1.6,LZf+0.5,{r:0.3,m:0.4,n:'ADA Drinking Fountain',d:'Hi-lo accessible fountain — IBC §2902.7, ADA §211.'});
 B(1.2,0.08,0.5,0x90a4ae,W/2-1.5,3.22,LZf+0.5,{r:0.2,m:0.5,ns:true}); // basin top
 // Emergency lighting units — IBC §1008.3 (along egress paths)
-for(const [ex,ez] of [[-W/2+1.5,15],[-W/2+1.5,-15],[W/2-1.5,15],[W/2-1.5,-15],[-W/2+1.5,LZf+9],[W/2-1.5,LZf+9]]){
+for(const [ex,ez] of [[-W/2+1.5,15],[-W/2+1.5,-15],[W/2-1.5,15],[W/2-1.5,-15],[-W/2+1.5,LZf+9],[W/2-1.5,LZf+9],[-W/2+1.5,-D/2+5],[W/2-1.5,-D/2+5]]){
   B(0.8,0.4,0.3,0xffffff,ex,H-1,ez,{r:0.2,ns:true,n:'Emergency Light',d:'Battery-backed — IBC §1008.3. 1 foot-candle min at floor.'});
   B(0.15,0.15,0.3,0xffeb3b,ex-0.2,H-0.8,ez,{ns:true,r:0.1}); // left lamp
   B(0.15,0.15,0.3,0xffeb3b,ex+0.2,H-0.8,ez,{ns:true,r:0.1}); // right lamp
@@ -948,7 +979,7 @@ let netsVis=true;
 window.toggleNets=()=>{
   netsVis=!netsVis;
   for(const grp of Object.values(netGroups))
-    grp.traverse(c=>{if(c.material&&c.material.wireframe!==undefined)c.material.opacity=netsVis?0.22:0;});
+    grp.traverse(c=>{if(c.material&&c.material.wireframe!==undefined)c.material.opacity=netsVis?0.35:0;});
   document.getElementById('mn').classList.toggle('active',!netsVis);
 };
 
